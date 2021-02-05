@@ -250,6 +250,22 @@ namespace GitGudCLI.Utils
             return ExecuteGitCommand($"push -u origin {branchName}");
         }
 
+        public GitResponse CanCommit()
+        {
+            var output = GetStatus();
+
+            if (output.Message.Contains("nothing to commit, working tree clean"))
+                return new(false, EnumGitResponse.GENERIC_ERROR, "Nothing to commit, working tree clean')");
+
+            if (output.Message.Contains("no changes added to commit"))
+                return new(false, EnumGitResponse.GENERIC_ERROR, "No changes added to commit. (use 'git add' or 'git commit -am')");
+
+            if (output.Message.Contains("nothing added to commit but untracked files present"))
+                return new(false, EnumGitResponse.GENERIC_ERROR, "Nothing added to commit, but untracked files are present (use 'git add')");
+
+            return new(true, EnumGitResponse.NONE, "There is changes to commit.");
+        }
+
         public GitResponse Commit(string commitMessage)
         {
             GitResponse output = ExecuteGitCommand($@"commit -m ""{commitMessage}""");
