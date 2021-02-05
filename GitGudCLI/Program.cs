@@ -120,21 +120,21 @@ namespace GitGudCLI
                 return;
             }
 
-            var status = _gitHelper.AddAllFiles();
-            if (status.Success)
+            var response = _gitHelper.AddAllFiles();
+            if (response.Success)
             {
                 ColorConsole.WriteInfo($"Added all files");
             }
             else
             {
-                ColorConsole.WriteError(status.Message);
+                ColorConsole.WriteError(response.Message);
                 return;
             }
 
-            status = _gitHelper.GetStatus();
-            if (status.Message.Contains("no changes added to commit"))
+            response = _gitHelper.CanCommit();
+            if (!response.Success)
             {
-                ColorConsole.WriteError("No changes added to commit. (use 'git add' or 'git commit -am').");
+                ColorConsole.WriteError(response.Message);
                 return;
             }
 
@@ -171,7 +171,6 @@ namespace GitGudCLI
             }
             else
             {
-                GitResponse response;
                 response = _gitHelper.Commit(commit.CommitMessage);
 
                 if (response.Success)
@@ -193,16 +192,10 @@ namespace GitGudCLI
                 return;
             }
 
-            var status = _gitHelper.GetStatus();
-            if (status.Message.Contains("no changes added to commit"))
+            var response = _gitHelper.CanCommit();
+            if (!response.Success)
             {
-                ColorConsole.WriteError("No changes added to commit. (use 'git add' or 'git commit -am').");
-                return;
-            }
-
-            if (status.Message.Contains("nothing added to commit but untracked files present"))
-            {
-                ColorConsole.WriteError("Nothing added to commit, but untracked files are present (use 'git add').");
+                ColorConsole.WriteError(response.Message);
                 return;
             }
 
@@ -243,7 +236,6 @@ namespace GitGudCLI
             }
             else
             {
-                GitResponse response;
                 if (commitAdd == 0)
                 {
                     response = _gitHelper.CommitAdd(commit.CommitMessage);
@@ -272,16 +264,10 @@ namespace GitGudCLI
                 return;
             }
 
-            var status = _gitHelper.GetStatus();
-            if (status.Message.Contains("no changes added to commit"))
+            var response = _gitHelper.CanCommit();
+            if (!response.Success)
             {
-                ColorConsole.WriteError("No changes added to commit. (use 'git add' or 'git commit -am').");
-                return;
-            }
-
-            if (status.Message.Contains("nothing added to commit but untracked files present"))
-            {
-                ColorConsole.WriteError("Nothing added to commit, but untracked files are present (use 'git add').");
+                ColorConsole.WriteError(response.Message);
                 return;
             }
 
@@ -334,7 +320,6 @@ namespace GitGudCLI
             }
             else
             {
-                GitResponse response;
                 if (commitAdd == 0)
                 {
                     response = _gitHelper.CommitAdd(commit.CommitMessage);

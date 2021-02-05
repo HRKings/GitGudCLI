@@ -268,13 +268,11 @@ namespace GitGudCLI.Utils
 
         public GitResponse Commit(string commitMessage)
         {
-            GitResponse output = ExecuteGitCommand($@"commit -m ""{commitMessage}""");
+            GitResponse output = CanCommit();
+            if (!output.Success)
+                return output;
 
-            if (output.Message.Contains("no changes added to commit"))
-                return new(false, EnumGitResponse.GENERIC_ERROR, "No changes added to commit. (use 'git add' or 'git commit -am')");
-
-            if (output.Message.Contains("nothing added to commit but untracked files present"))
-                return new(false, EnumGitResponse.GENERIC_ERROR, "Nothing added to commit, but untracked files are present (use 'git add')");
+            output = ExecuteGitCommand($@"commit -m ""{commitMessage}""");
 
             if (output.Success)
                 _needsRefresh = true;
@@ -284,10 +282,11 @@ namespace GitGudCLI.Utils
 
         public GitResponse CommitAdd(string commitMessage)
         {
-            GitResponse output = ExecuteGitCommand($@"commit -am ""{commitMessage}""");
+            GitResponse output = CanCommit();
+            if (!output.Success)
+                return output;
 
-            if (output.Message.Contains("nothing added to commit but untracked files present"))
-                return new(false, EnumGitResponse.GENERIC_ERROR, "Nothing added to commit, but untracked files are present (use 'git add')");
+            output = ExecuteGitCommand($@"commit -am ""{commitMessage}""");
 
             if (output.Success)
                 _needsRefresh = true;
