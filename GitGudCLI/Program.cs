@@ -120,27 +120,21 @@ namespace GitGudCLI
                 return;
             }
 
-            var status = _gitHelper.GetStatus();
-            if (status.Message.Contains("no changes added to commit"))
-            {
-                ColorConsole.WriteError("No changes added to commit. (use 'git add' or 'git commit -am').");
-                return;
-            }
-
-            if (status.Message.Contains("nothing added to commit but untracked files present"))
-            {
-                ColorConsole.WriteError("Nothing added to commit, but untracked files are present (use 'git add').");
-                return;
-            }
-
-            status = _gitHelper.AddAllFiles();
+            var status = _gitHelper.AddAllFiles();
             if (status.Success)
             {
-                ColorConsole.WriteInfo($"{status.Message}\nAdded all files");
+                ColorConsole.WriteInfo($"Added all files");
             }
             else
             {
                 ColorConsole.WriteError(status.Message);
+                return;
+            }
+
+            status = _gitHelper.GetStatus();
+            if (status.Message.Contains("no changes added to commit"))
+            {
+                ColorConsole.WriteError("No changes added to commit. (use 'git add' or 'git commit -am').");
                 return;
             }
 
