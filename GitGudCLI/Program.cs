@@ -24,6 +24,18 @@ namespace GitGudCLI
 
             switch (args[0])
             {
+                case "commitadd":
+                case "ca":
+                    if (args.Length >= 2)
+                    {
+                        CommitAdd(args[1]);
+                    }
+                    else
+                    {
+                        CommitAdd(string.Empty);
+                    }
+                    break;
+
                 case "commit":
                 case "c":
                     if (args.Length >= 2)
@@ -100,14 +112,87 @@ namespace GitGudCLI
             }
         }
 
-        public static void QuickCommit(string commitMessage)
+        public static void CommitAdd(string commitMessage)
         {
-            if (_gitHelper is null)
+            if (!_gitHelper.HasRepo)
             {
-                ColorConsole.WriteError("The repository is null;");
+                ColorConsole.WriteError("There is no repository");
                 return;
             }
 
+            var status = _gitHelper.GetStatus();
+            if (status.Message.Contains("no changes added to commit"))
+            {
+                ColorConsole.WriteError("No changes added to commit. (use 'git add' or 'git commit -am').");
+                return;
+            }
+
+            if (status.Message.Contains("nothing added to commit but untracked files present"))
+            {
+                ColorConsole.WriteError("Nothing added to commit, but untracked files are present (use 'git add').");
+                return;
+            }
+
+            status = _gitHelper.AddAllFiles();
+            if (status.Success)
+            {
+                ColorConsole.WriteInfo($"{status.Message}\nAdded all files");
+            }
+            else
+            {
+                ColorConsole.WriteError(status.Message);
+                return;
+            }
+
+            ColorConsole.WriteWrappedHeader("Navigate the tags with the arrow keys and select using enter:");
+            string tag = Constants.VALID_COMMIT_TAGS[CLIHelper.MenuChoice(false, Constants.COMMIT_TAGS_DESCRIPTIONS[..^1], Constants.VALID_COMMIT_TAGS[..^1])];
+
+            ColorConsole.WriteWrappedHeader("Navigate the flags with the arrow keys, select using enter and confirm with ESC (Optional):");
+            List<int> choices = CLIHelper.MultipleChoice(Constants.COMMIT_FLAGS_DESCRIPTIONS, Constants.VALID_COMMIT_FLAGS);
+            choices.Sort();
+            string[] flags = new string[choices.Count];
+            for (int i = 0; i < choices.Count; i++)
+            {
+                flags[i] = Constants.VALID_COMMIT_FLAGS[choices[i]];
+            }
+
+            if (string.IsNullOrWhiteSpace(commitMessage))
+            {
+                ColorConsole.WriteWrappedHeader("Please provide a commit message:");
+                commitMessage = Console.ReadLine();
+            }
+
+            CommitMessageGenerator generator = new()
+            {
+                Tag = tag,
+                Flags = flags,
+                Subject = commitMessage
+            };
+
+            var commit = generator.GenerateValidCommitMessage();
+
+            if (commit is null)
+            {
+                ColorConsole.WriteError("There was an error generating the commit message.");
+            }
+            else
+            {
+                GitResponse response;
+                response = _gitHelper.Commit(commit.CommitMessage);
+
+                if (response.Success)
+                {
+                    ColorConsole.WriteSuccess($"{response.Message}\nCommit made successfully.");
+                }
+                else
+                {
+                    ColorConsole.WriteError(response.Message);
+                }
+            }
+        }
+
+        public static void QuickCommit(string commitMessage)
+        {
             if (!_gitHelper.HasRepo)
             {
                 ColorConsole.WriteError("There is no repository");
@@ -187,12 +272,6 @@ namespace GitGudCLI
 
         public static void FullCommit(string commitMessage)
         {
-            if (_gitHelper is null)
-            {
-                ColorConsole.WriteError("The repository is null;");
-                return;
-            }
-
             if (!_gitHelper.HasRepo)
             {
                 ColorConsole.WriteError("There is no repository");
@@ -297,12 +376,6 @@ namespace GitGudCLI
 
         public static void Flow(string argument1, string argument2)
         {
-            if (_gitHelper is null)
-            {
-                ColorConsole.WriteError("The repository is null");
-                return;
-            }
-
             Flow flow = new(_gitHelper);
             FlowResponse response = new();
 

@@ -278,5 +278,15 @@ namespace GitGudCLI.Utils
 
             return output;
         }
+
+        public GitResponse AddAllFiles()
+        {
+            GitResponse output = ExecuteGitCommand($@"add .");
+
+            if (output.Success)
+                _needsRefresh = true;
+
+            return output;
+        }
     }
 }
