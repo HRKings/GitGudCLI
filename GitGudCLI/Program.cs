@@ -362,7 +362,7 @@ namespace GitGudCLI
                         argument2 = Console.ReadLine();
                     }
 
-                    flow.Publish(argument2);
+                    response = flow.Publish(argument2);
                     break;
 
                 case "complete":
@@ -372,7 +372,7 @@ namespace GitGudCLI
                         argument2 = Console.ReadLine();
                     }
 
-                    flow.Complete(argument2);
+                    response = flow.Complete(argument2);
                     break;
 
                 default:
