@@ -2,17 +2,17 @@
 
 namespace GitGudCLI.Response
 {
-    public struct GitResponse
-    {
-        public bool Success { get; init; }
-        public EnumGitResponse Response { get; init; }
-        public string Message { get; init; }
+	public readonly struct GitResponse
+	{
+		public bool Success { get; }
+		public EnumGitResponse Response { get; }
+		public string Message { get; }
 
-        public GitResponse(bool success, EnumGitResponse response, string message)
-        {
-            Success = success;
-            Response = response;
-            Message = message;
-        }
-    }
+		public GitResponse(bool success, EnumGitResponse response, string message)
+		{
+			Success = success;
+			Response = response;
+			Message = message;
+		}
+	}
 }
