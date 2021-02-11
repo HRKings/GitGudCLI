@@ -10,7 +10,8 @@ namespace GitGudCLI.Modules
 {
 	public class CommitMessageLinter
 	{
-		private readonly Regex _regex = new(Constants.ValidationRegex, RegexOptions.Compiled | RegexOptions.Multiline);
+		private readonly Regex _headerRegex = new(Constants.HeaderValidationRegex, RegexOptions.Compiled | RegexOptions.Multiline);
+		private readonly Regex _footerRegex = new(Constants.FooterValidationRegex, RegexOptions.Compiled | RegexOptions.Multiline);
 
 		private EnumCommitError _errors;
 		private EnumCommitWarning _warnings;
@@ -43,24 +44,42 @@ namespace GitGudCLI.Modules
 		public string[] SeeAlso { get; private set; }
 
         /// <summary>
-        ///     Validates a commit message
+        /// Validates a commit message
         /// </summary>
         /// <param name="commitMessage">The message to validate</param>
         /// <returns>If the validation was complete</returns>
-        public bool Validate(string commitMessage)
-		{
-			var match = _regex.Match(commitMessage);
-
-			// If the regex don't find anything, end here
-			if (!match.Success) return false;
+        private bool Validate(string commitMessage)
+        {
+	        string[] messageSplit = commitMessage.Split("~~~",
+		        StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+	        
+			var header = _headerRegex.Match(messageSplit[0]);
+			var footer = messageSplit.Length switch
+			{
+				1 => null,
+				2 => _footerRegex.Match(messageSplit[1]),
+				3 => _footerRegex.Match(messageSplit[2]),
+				_ => null
+			};
+			
+			// If the regex don't find a header, end here
+			if (!header.Success) return false;
 
 			// Se all the "Has" booleans
-			HasTag = match.Groups["tag"].Success;
-			HasFlags = match.Groups["flags"].Success;
-			HasSubject = match.Groups["subject"].Success;
-			HasBody = match.Groups["body"].Success;
-			HasClosedIssues = match.Groups["closed_issues"].Success;
-			HasSeeAlso = match.Groups["see_also"].Success;
+			HasTag = header.Groups["tag"].Success;
+			HasFlags = header.Groups["flags"].Success;
+			HasSubject = header.Groups["subject"].Success;
+
+			HasBody = messageSplit.Length switch
+			{
+				1 => false,
+				2 => !footer?.Success ?? false,
+				3 => !string.IsNullOrWhiteSpace(messageSplit[1]),
+				_ => false
+			};
+			
+			HasClosedIssues = footer?.Groups["closed_issues"].Success ?? false;
+			HasSeeAlso = footer?.Groups["see_also"].Success ?? false;
 
 			// The commit is already considered valid at this point if it has a tag and a subject
 			IsValid = HasTag && HasSubject;
@@ -73,15 +92,15 @@ namespace GitGudCLI.Modules
 
 			// If it has a tag, then remove the square brackets and save, if not save an empty string
 			Tag = HasTag
-				? match.Groups["tag"].Value
+				? header.Groups["tag"].Value
 					.Replace("[", string.Empty).Replace("]", string.Empty)
 				: string.Empty;
 
 			// If it has a subject, save it, if not save an empty string
-			Subject = match.Groups["subject"].Value;
+			Subject = header.Groups["subject"].Value;
 
 			// If it has a body, save it, if not save an empty string
-			Body = match.Groups["body"].Value;
+			Body =  HasBody ? messageSplit[1] : string.Empty;
 
 			// If it has an invalid tag, raise the error flag and invalidate the message
 			if (HasTag && !Constants.ValidCommitTags.Contains(Tag))
@@ -95,7 +114,7 @@ namespace GitGudCLI.Modules
 			{
 				// If it has flags, remove the first curly braces and split the string on the second ones, if not, set them to null
 				Flags = HasFlags
-					? match.Groups["flags"].Value.Replace("{", string.Empty).Replace("}", string.Empty)
+					? header.Groups["flags"].Value.Replace("{", string.Empty).Replace("}", string.Empty)
 						.Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
 					: null;
 
@@ -126,7 +145,7 @@ namespace GitGudCLI.Modules
 			{
 				// If we a closed issues section, remove the "Closes: " line and split on the comma. if not set the array to null
 				ClosedIssues = HasClosedIssues
-					? match.Groups["closed_issues"].Value.Replace("Closes: ", string.Empty)
+					? footer.Groups["closed_issues"].Value.Replace("Closes: ", string.Empty)
 						.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
 					: null;
 			}
@@ -141,8 +160,8 @@ namespace GitGudCLI.Modules
 			try
 			{
 				// If we a closed issues section, remove the "See also: " line and split on the comma. if not set the array to null
-				SeeAlso = match.Groups["see_also"].Success
-					? match.Groups["see_also"].Value.Replace("See also: ", string.Empty)
+				SeeAlso = HasSeeAlso
+					? footer.Groups["see_also"].Value.Replace("See also: ", string.Empty)
 						.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
 					: null;
 			}

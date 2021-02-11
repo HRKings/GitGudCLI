@@ -35,13 +35,21 @@ namespace GitGudCLI.Modules
 			result += $" {Subject}";
 
 			if (!string.IsNullOrWhiteSpace(Body))
-				result += $"\n\n{Body}";
+				result += $"\n~~~\n{Body}";
+
+			if (ClosedIssues?.Length > 0 || SeeAlso?.Length > 0)
+				result += "\n~~~\n";
 
 			if (ClosedIssues?.Length > 0)
-				result += $"\n\nCloses: {string.Join(", ", ClosedIssues)}";
-
-			if (ClosedIssues?.Length > 0)
-				result += $"\nSee Also: {string.Join(", ", SeeAlso)}";
+			{
+				result += $"Closes: {string.Join(", ", ClosedIssues)}";
+				
+				if (SeeAlso?.Length > 0)
+					result += "\n";
+			}
+			
+			if (SeeAlso?.Length > 0)
+				result += $"See Also: {string.Join(", ", SeeAlso)}";
 
 			return new CommitMessageLinter(result);
 		}

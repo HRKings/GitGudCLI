@@ -5,6 +5,9 @@
 		public const string ValidationRegex =
 			@"^(?<tag>\[\w+\])?(?<flags>\{.+\})?\s(?<subject>.+)?\n?\s?\n?(?<body>.*)?\n?\s?\n?(?<closed_issues>Closes:\s.*)?\n?(?<see_also>See also:\s.*)?";
 
+		public const string HeaderValidationRegex = @"^(?<tag>\[.+\])?(?<flags>\{.+\})?\s(?<subject>.+?)?";
+		public const string FooterValidationRegex = @"^(?<closed_issues>Closes:\s.*)?\n?(?<see_also>See also:\s.*)";
+
 		public static readonly string[] ValidCommitTags =
 		{
 			"feature",
