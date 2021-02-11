@@ -5,12 +5,12 @@ namespace GitGudCLI.Modules
 {
 	public class CommitMessageGenerator
 	{
-		public string Tag { get; set; }
-		public string[] Flags { get; set; }
-		public string Subject { get; set; }
-		public string Body { get; set; }
-		public string[] ClosedIssues { get; set; }
-		public string[] SeeAlso { get; set; }
+		public string Tag { get; init; }
+		public string[] Flags { get; init; }
+		public string Subject { get; init; }
+		public string Body { get; init; }
+		public string[] ClosedIssues { get; init; }
+		public string[] SeeAlso { get; init; }
 
 		public CommitMessageLinter GenerateValidCommitMessage()
 		{
@@ -24,11 +24,12 @@ namespace GitGudCLI.Modules
 
 			if (Flags?.Length > 0)
 			{
-				foreach (string flag in Flags)
-					if (!Constants.ValidCommitFlags.Contains(flag))
-						return null;
+				if (Flags.Any(flag => !Constants.ValidCommitFlags.Contains(flag)))
+				{
+					return null;
+				}
 
-				result += $@"{{{string.Join("}{", Flags)}}}";
+				result += $@"{{{string.Join("/", Flags)}}}";
 			}
 
 			result += $" {Subject}";

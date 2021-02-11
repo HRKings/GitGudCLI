@@ -95,22 +95,19 @@ namespace GitGudCLI.Modules
 			{
 				// If it has flags, remove the first curly braces and split the string on the second ones, if not, set them to null
 				Flags = HasFlags
-					? match.Groups["flags"].Value.Replace("{", string.Empty)
-						.Split('}', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+					? match.Groups["flags"].Value.Replace("{", string.Empty).Replace("}", string.Empty)
+						.Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
 					: null;
 
 				// If we captured any flag
 				if (Flags?.Length > 0)
 				{
 					// Test each of the captured ones
-					foreach (string flag in Flags)
-						// If one flag isn't valid, raise the flag, invalidate the message and break the loop as we only need to raise the error flag once
-						if (!Constants.ValidCommitFlags.Contains(flag))
-						{
-							_errors |= EnumCommitError.INVALID_FLAG;
-							IsValid = false;
-							break;
-						}
+					if (Flags.Any(flag => !Constants.ValidCommitFlags.Contains(flag)))
+					{
+						_errors |= EnumCommitError.INVALID_FLAG;
+						IsValid = false;
+					}
 
 					// If the breaking change flag is present, but it's not the first flag to appear, then raise a warning flag
 					if (Flags.Contains("!!!") && Flags[0] != "!!!")
