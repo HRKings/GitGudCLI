@@ -31,17 +31,10 @@ namespace GitGudCLI.Modules
 				return new FlowResponse(false, EnumFlowResponse.NONE, EnumGitResponse.BRANCH_DOESNT_EXISTS,
 					"The repository doesn't have a master branch");
 
-			var response = ParseGitResponse(_gitRepo.CreateEmptyBranchChekout("stable"));
+			var response = ParseGitResponse(_gitRepo.CreateBranchChekout("stable"));
 			if (!response.Success)
 				return response;
-
-			_ = ParseGitResponse(GitHelper.ExecuteGitCommand("rm -rf ."));
-
-			response = ParseGitResponse(
-				GitHelper.ExecuteGitCommand(@"commit --allow-empty -m ""[misc] Stable branch start"""));
-			if (!response.Success)
-				return response;
-
+			
 			response = ParseGitResponse(_gitRepo.Checkout("master"));
 			if (!response.Success)
 				return response;

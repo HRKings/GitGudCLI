@@ -143,8 +143,10 @@ namespace GitGudCLI.Utils
 			response = ExecuteGitCommand("checkout -b master");
 			if (!response.Success)
 				return response;
-
-			response = ExecuteGitCommand(@"commit --allow-empty -m ""[misc] Master branch start""");
+			
+			response = CanCommit().Success ? CommitAdd("[misc] Initial commit")
+				: ExecuteGitCommand(@"commit --allow-empty -m ""[misc] Initial commit""");
+			
 			if (!response.Success)
 				return response;
 
@@ -264,7 +266,7 @@ namespace GitGudCLI.Utils
 			var output = GetStatus();
 
 			if (output.Message.Contains("nothing to commit, working tree clean"))
-				return new GitResponse(false, EnumGitResponse.GENERIC_ERROR, "Nothing to commit, working tree clean')");
+				return new GitResponse(false, EnumGitResponse.GENERIC_ERROR, "Nothing to commit, working tree clean'");
 
 			if (output.Message.Contains("no changes added to commit"))
 				return new GitResponse(false, EnumGitResponse.GENERIC_ERROR,
@@ -273,6 +275,9 @@ namespace GitGudCLI.Utils
 			if (output.Message.Contains("nothing added to commit but untracked files present"))
 				return new GitResponse(false, EnumGitResponse.GENERIC_ERROR,
 					"Nothing added to commit, but untracked files are present (use 'git add')");
+			
+			if (output.Message.Contains("nothing to commit"))
+				return new GitResponse(false, EnumGitResponse.GENERIC_ERROR, "Nothing to commit'");
 
 			return new GitResponse(true, EnumGitResponse.NONE, "There is changes to commit.");
 		}
