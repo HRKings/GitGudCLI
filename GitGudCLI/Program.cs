@@ -97,7 +97,7 @@ namespace GitGudCLI
 			string tag =  Prompt.Select("Select the commit tag: ", Constants.CommitTagsWithDescriptions[..^1])
 				.Split(':', StringSplitOptions.TrimEntries)[0];
 
-			var flags = Prompt.MultiSelect("Select the flags for this commit: ", Constants.ValidCommitFlags, pageSize: 7)
+			var flags = Prompt.MultiSelect("Select the flags for this commit: ", Constants.CommitFlagsWithDescriptions, pageSize: 7, minimum: 0)
 				.Select(flag => flag.Split(':', StringSplitOptions.TrimEntries)[0]);
 
 			if (string.IsNullOrWhiteSpace(commitMessage))
