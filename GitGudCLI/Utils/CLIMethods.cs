@@ -194,11 +194,11 @@ namespace GitGudCLI.Utils
 
 			if (argument1 == "fullinit")
 			{
-				var createReponse = helper.CreateRepository();
+				var createResponse = helper.CreateRepository();
 
-				if (!createReponse.Success)
+				if (!createResponse.Success)
 				{
-					ColorConsole.WriteError(createReponse.Message);
+					ColorConsole.WriteError(createResponse.Message);
 					return;
 				}
 
