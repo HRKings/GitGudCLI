@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Linq;
 using ConsoleHelper;
 using GitGudCLI.Modules;
 using GitGudCLI.Response;
 using GitGudCLI.Structure;
 using GitGudCLI.Utils;
+using Sharprompt;
 
 namespace GitGudCLI
 {
@@ -91,18 +93,12 @@ namespace GitGudCLI
 				ColorConsole.WriteError(response.Message);
 				return;
 			}
+			
+			string tag =  Prompt.Select("Select the commit tag: ", Constants.CommitTagsWithDescriptions[..^1])
+				.Split(':', StringSplitOptions.TrimEntries)[0];
 
-			ColorConsole.WriteWrappedHeader("Navigate the tags with the arrow keys and select using enter:");
-			string tag = Constants.ValidCommitTags[
-				CLIHelper.MenuChoice(false, Constants.CommitTagsDescriptions[..^1],
-					Constants.ValidCommitTags[..^1])];
-
-			ColorConsole.WriteWrappedHeader(
-				"Navigate the flags with the arrow keys, select using enter and confirm with ESC (Optional):");
-			var choices = CLIHelper.MultipleChoice(Constants.CommitFlagsDescriptions, Constants.ValidCommitFlags);
-			choices.Sort();
-			var flags = new string[choices.Count];
-			for (var i = 0; i < choices.Count; i++) flags[i] = Constants.ValidCommitFlags[choices[i]];
+			var flags = Prompt.MultiSelect("Select the flags for this commit: ", Constants.ValidCommitFlags, pageSize: 7)
+				.Select(flag => flag.Split(':', StringSplitOptions.TrimEntries)[0]);
 
 			if (string.IsNullOrWhiteSpace(commitMessage))
 			{
@@ -113,7 +109,7 @@ namespace GitGudCLI
 			CommitMessageGenerator generator = new()
 			{
 				Tag = tag,
-				Flags = flags,
+				Flags = flags as string[],
 				Subject = commitMessage
 			};
 
@@ -150,16 +146,14 @@ namespace GitGudCLI
 			}
 
 			ColorConsole.WriteWrappedHeader("Navigate the tags with the arrow keys and select using enter:");
-			string tag = Constants.ValidCommitTags[
-				CLIHelper.MenuChoice(false, Constants.CommitTagsDescriptions[..^1],
-					Constants.ValidCommitTags[..^1])];
+			string tag = Prompt.Select("Select the commit tag: ", Constants.CommitTagsWithDescriptions[..^1])
+				.Split(':', StringSplitOptions.TrimEntries)[0];
 
 			ColorConsole.WriteWrappedHeader(
 				"Navigate the flags with the arrow keys, select using enter and confirm with ESC (Optional):");
-			var choices = CLIHelper.MultipleChoice(Constants.CommitFlagsDescriptions, Constants.ValidCommitFlags);
-			choices.Sort();
-			var flags = new string[choices.Count];
-			for (var i = 0; i < choices.Count; i++) flags[i] = Constants.ValidCommitFlags[choices[i]];
+			
+			var flags = Prompt.MultiSelect("Select the flags for this commit: ", Constants.ValidCommitFlags, pageSize: 7)
+				.Select(flag => flag.Split(':', StringSplitOptions.TrimEntries)[0]);
 
 			if (string.IsNullOrWhiteSpace(commitMessage))
 			{
@@ -174,7 +168,7 @@ namespace GitGudCLI
 			CommitMessageGenerator generator = new()
 			{
 				Tag = tag,
-				Flags = flags,
+				Flags = flags as string[],
 				Subject = commitMessage
 			};
 
@@ -209,18 +203,12 @@ namespace GitGudCLI
 				ColorConsole.WriteError(response.Message);
 				return;
 			}
-
-			ColorConsole.WriteWrappedHeader("Navigate the tags with the arrow keys and select using enter:");
-			string tag = Constants.ValidCommitTags[
-				CLIHelper.MenuChoice(false, Constants.CommitTagsDescriptions[..^1],
-					Constants.ValidCommitTags[..^1])];
-
-			ColorConsole.WriteWrappedHeader(
-				"Navigate the flags with the arrow keys, select using enter and confirm with ESC (Optional):");
-			var choices = CLIHelper.MultipleChoice(Constants.CommitFlagsDescriptions, Constants.ValidCommitFlags);
-			choices.Sort();
-			var flags = new string[choices.Count];
-			for (var i = 0; i < choices.Count; i++) flags[i] = Constants.ValidCommitFlags[choices[i]];
+			
+			string tag =  Prompt.Select("Select the commit tag: ", Constants.CommitTagsWithDescriptions[..^1])
+				.Split(':', StringSplitOptions.TrimEntries)[0];
+			
+			var flags = Prompt.MultiSelect("Select the flags for this commit: ", Constants.ValidCommitFlags, pageSize: 7)
+				.Select(flag => flag.Split(':', StringSplitOptions.TrimEntries)[0]);
 
 			if (string.IsNullOrWhiteSpace(commitMessage))
 			{
@@ -246,7 +234,7 @@ namespace GitGudCLI
 			CommitMessageGenerator generator = new()
 			{
 				Tag = tag,
-				Flags = flags,
+				Flags = flags as string[],
 				Subject = commitMessage,
 				Body = commitBody,
 				ClosedIssues = closedIssues,
@@ -384,22 +372,19 @@ namespace GitGudCLI
 
 			ColorConsole.WriteWrappedHeader("Navigate the tags with the arrow keys and select using enter:");
 
-			string tag = Constants.ValidCommitTags[
-				CLIHelper.MenuChoice(false, Constants.CommitTagsDescriptions[..^1],
-					Constants.ValidCommitTags[..^1])];
+			string tag =  Prompt.Select("Select the commit tag: ", Constants.CommitTagsWithDescriptions[..^1])
+				.Split(':', StringSplitOptions.TrimEntries)[0];
 
 			ColorConsole.WriteWrappedHeader(
 				"Navigate the flags with the arrow keys, select using enter and confirm with ESC:");
 
-			var choices = CLIHelper.MultipleChoice(Constants.CommitFlagsDescriptions, Constants.ValidCommitFlags);
-			choices.Sort();
-			var flags = new string[choices.Count];
-			for (var i = 0; i < choices.Count; i++) flags[i] = Constants.ValidCommitFlags[choices[i]];
+			var flags = Prompt.MultiSelect("Select the flags for this commit: ", Constants.ValidCommitFlags, pageSize: 7)
+				.Select(flag => flag.Split(':', StringSplitOptions.TrimEntries)[0]);
 
 			CommitMessageGenerator generator = new()
 			{
 				Tag = tag,
-				Flags = flags,
+				Flags = flags as string[],
 				Subject = message
 			};
 
