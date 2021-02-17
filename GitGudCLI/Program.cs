@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Linq;
 using ConsoleHelper;
 using GitGudCLI.Modules;
@@ -98,7 +99,7 @@ namespace GitGudCLI
 				.Split(':', StringSplitOptions.TrimEntries)[0];
 
 			var flags = Prompt.MultiSelect("Select the flags for this commit: ", Constants.CommitFlagsWithDescriptions, pageSize: 7, minimum: 0)
-				.Select(flag => flag.Split(':', StringSplitOptions.TrimEntries)[0]);
+				.OrderBy(flag => flag).Select(flag => flag.Split(':', StringSplitOptions.TrimEntries)[0]);
 
 			if (string.IsNullOrWhiteSpace(commitMessage))
 			{
