@@ -84,19 +84,8 @@ namespace GitGudCLI
 				ColorConsole.WriteError("There is no repository");
 				return;
 			}
-
-			var response = _gitHelper.AddAllFiles();
-			if (response.Success)
-			{
-				ColorConsole.WriteInfo("Added all files");
-			}
-			else
-			{
-				ColorConsole.WriteError(response.Message);
-				return;
-			}
-
-			response = _gitHelper.CanCommit();
+			
+			var response = _gitHelper.CanCommit(true);
 			if (!response.Success)
 			{
 				ColorConsole.WriteError(response.Message);
@@ -136,7 +125,7 @@ namespace GitGudCLI
 			}
 			else
 			{
-				response = _gitHelper.Commit(commit.CommitMessage);
+				response = _gitHelper.CommitFullAdd(commit.CommitMessage);
 
 				if (response.Success)
 					ColorConsole.WriteSuccess($"{response.Message}\nCommit made successfully.");

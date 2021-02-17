@@ -64,7 +64,7 @@ namespace GitGudCLI.Utils
 
 			process.WaitForExit();
 
-			if (!string.IsNullOrWhiteSpace(error))
+			if (!string.IsNullOrWhiteSpace(error) && !error.StartsWith("warning:"))
 			{
 				if (error.StartsWith("fatal"))
 					return new GitResponse(false, EnumGitResponse.FATAL_ERROR, $"{output}{error}");
@@ -143,8 +143,8 @@ namespace GitGudCLI.Utils
 			response = ExecuteGitCommand("checkout -b master");
 			if (!response.Success)
 				return response;
-			
-			response = CanCommit().Success ? CommitAdd("[misc] Initial commit")
+
+			response = CanCommit(true, true).Success ? CommitFullAdd("[misc] Initial commit")
 				: ExecuteGitCommand(@"commit --allow-empty -m ""[misc] Initial commit""");
 			
 			if (!response.Success)
@@ -261,18 +261,18 @@ namespace GitGudCLI.Utils
 			return ExecuteGitCommand($"push -u origin {branchName}");
 		}
 
-		public GitResponse CanCommit()
+		public GitResponse CanCommit(bool allowChanges = false, bool allowUntracked = false)
 		{
 			var output = GetStatus();
 
 			if (output.Message.Contains("nothing to commit, working tree clean"))
 				return new GitResponse(false, EnumGitResponse.GENERIC_ERROR, "Nothing to commit, working tree clean'");
 
-			if (output.Message.Contains("no changes added to commit"))
+			if (!allowChanges && output.Message.Contains("no changes added to commit"))
 				return new GitResponse(false, EnumGitResponse.GENERIC_ERROR,
 					"No changes added to commit. (use 'git add' or 'git commit -am')");
 
-			if (output.Message.Contains("nothing added to commit but untracked files present"))
+			if (!allowUntracked && output.Message.Contains("nothing added to commit but untracked files present"))
 				return new GitResponse(false, EnumGitResponse.GENERIC_ERROR,
 					"Nothing added to commit, but untracked files are present (use 'git add')");
 			
@@ -309,14 +309,28 @@ namespace GitGudCLI.Utils
 
 			return output;
 		}
-
-		public GitResponse AddAllFiles()
+		
+		public GitResponse CommitFullAdd(string commitMessage)
 		{
-			var output = ExecuteGitCommand(@"add .");
-
+			var output = CanCommit(true, true);
+			if (!output.Success)
+				return output;
+			
+			output = AddAllFiles();
+			if (!output.Success)
+				return new GitResponse(false, EnumGitResponse.GENERIC_ERROR, output.Message);
+			
+			output = ExecuteGitCommand($@"commit -am ""{commitMessage}""");
 			if (output.Success)
 				_needsRefresh = true;
 
+			return output;
+		}
+
+		public GitResponse AddAllFiles()
+		{
+			var output = ExecuteGitCommand(@"add -A");
+			
 			return output;
 		}
 	}
