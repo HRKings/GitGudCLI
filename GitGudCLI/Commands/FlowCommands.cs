@@ -26,9 +26,9 @@ namespace GitGudCLI.Commands
 				ColorConsole.WriteError("There is no repository");
 				return 1;
 			}
-			
+
 			if (string.IsNullOrWhiteSpace(_options.BranchName) && _options.Action is not "init" or "fullinit")
-				_options.BranchName = Prompt.Input<string>("Please provide a branch name:");
+				_options.BranchName = Prompt.Select("Please select a branch", helper.LocalBranches);
 
 			switch (_options.Action)
 			{
