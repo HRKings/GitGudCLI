@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
+using CliWrap;
+using CliWrap.Buffered;
+using ConsoleHelper;
 using GitGudCLI.Response;
 using GitGudCLI.Structure;
 
@@ -48,32 +52,18 @@ namespace GitGudCLI.Utils
 
 		public static GitResponse ExecuteGitCommand(string command)
 		{
-			var process = new Process();
-			process.StartInfo.FileName = "git";
-			process.StartInfo.Arguments = command;
-			process.StartInfo.RedirectStandardOutput = true;
-			process.StartInfo.RedirectStandardError = true;
-			process.Start();
-
-			// Synchronously read the standard output of the spawned process.
-			var outputReader = process.StandardOutput;
-			string output = outputReader.ReadToEnd();
-
-			var errorReader = process.StandardError;
-			string error = errorReader.ReadToEnd();
-
-			process.WaitForExit();
-
-			if (!string.IsNullOrWhiteSpace(error))
+			var commandResult = Cli.Wrap("git").WithArguments(command).ExecuteBufferedAsync().GetAwaiter().GetResult();
+			
+			if (!string.IsNullOrWhiteSpace(commandResult.StandardError) && !commandResult.StandardError.StartsWith("warning:"))
 			{
-				if (error.StartsWith("fatal"))
-					return new GitResponse(false, EnumGitResponse.FATAL_ERROR, $"{output}{error}");
+				if (commandResult.StandardError.StartsWith("fatal"))
+					return new GitResponse(false, EnumGitResponse.FATAL_ERROR, $"{commandResult.StandardOutput}{commandResult.StandardError}");
 
-				if (error.StartsWith("error"))
-					return new GitResponse(false, EnumGitResponse.GENERIC_ERROR, $"{output}{error}");
+				if (commandResult.StandardError.StartsWith("error"))
+					return new GitResponse(false, EnumGitResponse.GENERIC_ERROR, $"{commandResult.StandardOutput}{commandResult.StandardError}");
 			}
 
-			return new GitResponse(true, EnumGitResponse.NONE, $"{output}{error}");
+			return new GitResponse(true, EnumGitResponse.NONE, $"{commandResult.StandardOutput}{commandResult.StandardError}");
 		}
 
 		public static IEnumerable<string> GetLocalBranches()
@@ -143,8 +133,8 @@ namespace GitGudCLI.Utils
 			response = ExecuteGitCommand("checkout -b master");
 			if (!response.Success)
 				return response;
-			
-			response = CanCommit().Success ? CommitAdd("[misc] Initial commit")
+
+			response = CanCommit(true, true).Success ? CommitFullAdd("[misc] Initial commit")
 				: ExecuteGitCommand(@"commit --allow-empty -m ""[misc] Initial commit""");
 			
 			if (!response.Success)
@@ -180,24 +170,7 @@ namespace GitGudCLI.Utils
 			return new GitResponse(true, EnumGitResponse.NONE,
 				$"Branch {branchName} created successfully\n{output.Message}");
 		}
-
-		public GitResponse CreateEmptyBranchChekout(string branchName)
-		{
-			Refresh();
-
-			if (LocalBranches.Contains(branchName))
-				return new GitResponse(false, EnumGitResponse.BRANCH_ALREADY_EXISTS,
-					$"The branch {branchName} already exists.");
-
-			var output = ExecuteGitCommand($"checkout --orphan {branchName}");
-
-			if (output.Success)
-				_needsRefresh = true;
-
-			return new GitResponse(true, EnumGitResponse.NONE,
-				$"{output.Message}\nBranch {branchName} created successfully.");
-		}
-
+		
 		public GitResponse DeleteBranch(string branchName)
 		{
 			Refresh();
@@ -243,7 +216,15 @@ namespace GitGudCLI.Utils
 			if (!response.Success)
 				return response;
 
-			return ExecuteGitCommand($"merge {fromBranch}");
+			response = ExecuteGitCommand($"merge {fromBranch}");
+			if (!response.Success)
+			{
+				ColorConsole.WriteError("Merge failed, aborting !");
+				var abortResponse = ExecuteGitCommand("merge --abort");
+				return new(false, EnumGitResponse.FATAL_ERROR, $"{response.Message}\n{abortResponse.Message}");
+			}
+
+			return response;
 		}
 
 		public GitResponse PushBranchToOrigin(string branchName)
@@ -261,18 +242,18 @@ namespace GitGudCLI.Utils
 			return ExecuteGitCommand($"push -u origin {branchName}");
 		}
 
-		public GitResponse CanCommit()
+		public GitResponse CanCommit(bool allowChanges = false, bool allowUntracked = false)
 		{
 			var output = GetStatus();
 
 			if (output.Message.Contains("nothing to commit, working tree clean"))
 				return new GitResponse(false, EnumGitResponse.GENERIC_ERROR, "Nothing to commit, working tree clean'");
 
-			if (output.Message.Contains("no changes added to commit"))
+			if (!allowChanges && output.Message.Contains("no changes added to commit"))
 				return new GitResponse(false, EnumGitResponse.GENERIC_ERROR,
 					"No changes added to commit. (use 'git add' or 'git commit -am')");
 
-			if (output.Message.Contains("nothing added to commit but untracked files present"))
+			if (!allowUntracked && output.Message.Contains("nothing added to commit but untracked files present"))
 				return new GitResponse(false, EnumGitResponse.GENERIC_ERROR,
 					"Nothing added to commit, but untracked files are present (use 'git add')");
 			
@@ -309,14 +290,28 @@ namespace GitGudCLI.Utils
 
 			return output;
 		}
-
-		public GitResponse AddAllFiles()
+		
+		public GitResponse CommitFullAdd(string commitMessage)
 		{
-			var output = ExecuteGitCommand(@"add .");
-
+			var output = CanCommit(true, true);
+			if (!output.Success)
+				return output;
+			
+			output = AddAllFiles();
+			if (!output.Success)
+				return new GitResponse(false, EnumGitResponse.GENERIC_ERROR, output.Message);
+			
+			output = ExecuteGitCommand($@"commit -am ""{commitMessage}""");
 			if (output.Success)
 				_needsRefresh = true;
 
+			return output;
+		}
+
+		public GitResponse AddAllFiles()
+		{
+			var output = ExecuteGitCommand(@"add -A");
+			
 			return output;
 		}
 	}

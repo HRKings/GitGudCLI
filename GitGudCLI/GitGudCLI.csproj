@@ -3,10 +3,19 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <PackageId>HRKings.GitGudCLI</PackageId>
+    <Title>GitGudCLI</Title>
+    <Authors>HRKings</Authors>
+    <Description>A CLI for the GitGud model</Description>
+    <RepositoryUrl>https://github.com/HRKings/GitGudCLI</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CliWrap" Version="3.3.0" />
+    <PackageReference Include="CommandLineParser" Version="2.8.0" />
     <PackageReference Include="Rhaizzing.ConsoleHelper" Version="1.1.4" />
+    <PackageReference Include="Sharprompt" Version="2.1.2" />
   </ItemGroup>
 
 </Project>
