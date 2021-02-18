@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using CliWrap;
+using CliWrap.Buffered;
 using GitGudCLI.Response;
 using GitGudCLI.Structure;
 
@@ -48,32 +50,18 @@ namespace GitGudCLI.Utils
 
 		public static GitResponse ExecuteGitCommand(string command)
 		{
-			var process = new Process();
-			process.StartInfo.FileName = "git";
-			process.StartInfo.Arguments = command;
-			process.StartInfo.RedirectStandardOutput = true;
-			process.StartInfo.RedirectStandardError = true;
-			process.Start();
-
-			// Synchronously read the standard output of the spawned process.
-			var outputReader = process.StandardOutput;
-			string output = outputReader.ReadToEnd();
-
-			var errorReader = process.StandardError;
-			string error = errorReader.ReadToEnd();
-
-			process.WaitForExit();
-
-			if (!string.IsNullOrWhiteSpace(error) && !error.StartsWith("warning:"))
+			var commandResult = Cli.Wrap("git").WithArguments(command).ExecuteBufferedAsync().GetAwaiter().GetResult();
+			
+			if (!string.IsNullOrWhiteSpace(commandResult.StandardError) && !commandResult.StandardError.StartsWith("warning:"))
 			{
-				if (error.StartsWith("fatal"))
-					return new GitResponse(false, EnumGitResponse.FATAL_ERROR, $"{output}{error}");
+				if (commandResult.StandardError.StartsWith("fatal"))
+					return new GitResponse(false, EnumGitResponse.FATAL_ERROR, $"{commandResult.StandardOutput}{commandResult.StandardError}");
 
-				if (error.StartsWith("error"))
-					return new GitResponse(false, EnumGitResponse.GENERIC_ERROR, $"{output}{error}");
+				if (commandResult.StandardError.StartsWith("error"))
+					return new GitResponse(false, EnumGitResponse.GENERIC_ERROR, $"{commandResult.StandardOutput}{commandResult.StandardError}");
 			}
 
-			return new GitResponse(true, EnumGitResponse.NONE, $"{output}{error}");
+			return new GitResponse(true, EnumGitResponse.NONE, $"{commandResult.StandardOutput}{commandResult.StandardError}");
 		}
 
 		public static IEnumerable<string> GetLocalBranches()
