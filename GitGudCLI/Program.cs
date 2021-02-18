@@ -10,18 +10,17 @@ namespace GitGudCLI
 	{
 		private static GitHelper _gitHelper;
 
-		private static void Main(string[] args)
+		private static int Main(string[] args)
 		{
 			_gitHelper = new GitHelper();
 			
 			Parser.Default.ParseArguments<CommitOptions>(args)
 				.WithParsed<CommitOptions>(options => CommitCommands.Run(options, _gitHelper));
-				//.WithNotParsed(errors => ...);
-			
+
 			if (args.Length == 0)
 			{
 				Console.WriteLine("HELP_TEXT");
-				return;
+				return 1;
 			}
 
 			switch (args[0])
@@ -53,6 +52,8 @@ namespace GitGudCLI
 					Console.WriteLine($"Argument \"{args[0]}\" is not valid.");
 					break;
 			}
+
+			return 0;
 		}
 	}
 }

@@ -10,50 +10,48 @@ namespace GitGudCLI.Options
 {
 	public static class CommitCommands
 	{
-		public static void Run(CommitOptions options, GitHelper helper)
+		public static int Run(CommitOptions options, GitHelper helper)
 		{
 			switch (options.Mode)
 			{
 				case "quickadd":
 				case "qa":
-					QuickCommit(options.Message, true, helper);
-					break;
+					return QuickCommit(options.Message, true, helper);
 
 				case "commit":
 				case "c":
-					QuickCommit(options.Message, false, helper);
-					break;
+					return QuickCommit(options.Message, false, helper);
 
 				case "fullcommit":
 				case "fc":
-					FullCommit(options.Message, helper);
-					break;
+					return FullCommit(options.Message, helper);
 
 				case "commitlint":
 				case "cmli":
-					ValidateCommit(options.Message);
-					break;
+					return ValidateCommit(options.Message);
+
 
 				case "commitgen":
 				case "cmgn":
-					GenerateValidCommit(options.Message);
-					break;
+					return GenerateValidCommit(options.Message);
 			}
+
+			return 0;
 		}
 		
-		private static void QuickCommit(string commitMessage, bool fullAdd, GitHelper helper)
+		private static int QuickCommit(string commitMessage, bool fullAdd, GitHelper helper)
 		{
 			if (!helper.HasRepo)
 			{
 				ColorConsole.WriteError("There is no repository");
-				return;
+				return 1;
 			}
 			
 			var response = helper.CanCommit(true, true && fullAdd);
 			if (!response.Success)
 			{
 				ColorConsole.WriteError(response.Message);
-				return;
+				return 1;
 			}
 			
 			string tag =  Prompt.Select("Select the commit tag: ", Constants.CommitTagsWithDescriptions[..^1])
@@ -106,9 +104,11 @@ namespace GitGudCLI.Options
 				else
 					ColorConsole.WriteError(response.Message);
 			}
+
+			return 0;
 		}
 		
-		public static void ValidateCommit(string commit)
+		public static int ValidateCommit(string commit)
 		{
 			if (string.IsNullOrWhiteSpace(commit))
 			{
@@ -119,21 +119,23 @@ namespace GitGudCLI.Options
 			CommitMessageLinter toValidate = new(commit);
 
 			toValidate.WriteReport();
+
+			return 0;
 		}
 		
-		private static void FullCommit(string commitMessage, GitHelper helper)
+		private static int FullCommit(string commitMessage, GitHelper helper)
 		{
 			if (!helper.HasRepo)
 			{
 				ColorConsole.WriteError("There is no repository");
-				return;
+				return 1;
 			}
 
 			var response = helper.CanCommit();
 			if (!response.Success)
 			{
 				ColorConsole.WriteError(response.Message);
-				return;
+				return 1;
 			}
 			
 			string tag =  Prompt.Select("Select the commit tag: ", Constants.CommitTagsWithDescriptions[..^1])
@@ -189,9 +191,11 @@ namespace GitGudCLI.Options
 				else
 					ColorConsole.WriteError(response.Message);
 			}
+
+			return 0;
 		}
 		
-		private static void GenerateValidCommit(string message)
+		private static int GenerateValidCommit(string message)
 		{
 			if (string.IsNullOrWhiteSpace(message))
 			{
@@ -216,6 +220,8 @@ namespace GitGudCLI.Options
 			ColorConsole.WriteWrappedHeader("Your commit message:");
 
 			Console.WriteLine(generator.GenerateValidCommitMessage().CommitMessage);
+
+			return 0;
 		}
 	}
 }
