@@ -228,7 +228,7 @@ namespace GitGudCLI.Utils
 					if (string.IsNullOrWhiteSpace(argument2))
 						argument2 = Prompt.Input<string>("Please provide a branch name:");
 
-					string type = Prompt.Select("Select the branch type: ", Constants.ValidWorkingBranchTypeWithDescriptions[..^1])
+					string type = Prompt.Select("Select the branch type: ", Constants.ValidWorkingBranchTypeWithDescriptions)
 						.Split(':', StringSplitOptions.TrimEntries)[0];
 
 					response = flow.Start(argument2, type);
