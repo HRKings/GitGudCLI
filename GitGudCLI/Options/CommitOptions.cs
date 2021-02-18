@@ -6,7 +6,12 @@ namespace GitGudCLI.Options
 	[Verb("commit", true, HelpText = "Simplify commiting")]
 	public class CommitOptions
 	{
-		[Value(0, Required = true, Default = "quickadd", HelpText = "The commit mode (quickadd/qa, commit/c, fullcommit/fc)")] 
+		[Value(0, Required = true, Default = "quickadd", HelpText = @"The commit mode
+quickadd   [q] : Tracks all files and commit them
+commit     [c] : Can choose between a plain commit or 'commit -am'
+fullcommit [f] : A full commit with body and footer
+lint       [l] : Lint a commit
+generate   [g] : Generate a valid commit message")] 
 		public string Mode { get; set; }
 		
 		[Value(1, HelpText = "The commit message")] 

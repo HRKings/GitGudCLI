@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using ConsoleHelper;
 using GitGudCLI.Modules;
+using GitGudCLI.Options;
 using GitGudCLI.Response;
 using GitGudCLI.Utils;
 using Sharprompt;
 
-namespace GitGudCLI.Options
+namespace GitGudCLI.Commands
 {
 	public static class CommitCommands
 	{
@@ -42,7 +42,7 @@ namespace GitGudCLI.Options
 			switch (options.Mode)
 			{
 				case "quickadd":
-				case "qa":
+				case "q":
 					Commit(true, false);
 					break;
 
@@ -52,18 +52,18 @@ namespace GitGudCLI.Options
 					break;
 
 				case "fullcommit":
-				case "fc":
+				case "f":
 					Commit(false, true);
 					break;
 
 				case "lint":
-				case "lnt":
+				case "l":
 					CommitMessageLinter toValidate = new(_options.Message);
 					toValidate.WriteReport();
 					return 0;
 
 				case "generate":
-				case "gen":
+				case "g":
 					string message = GenerateCommitMessage(false, false, false, false);
 					if (string.IsNullOrWhiteSpace(message))
 					{
