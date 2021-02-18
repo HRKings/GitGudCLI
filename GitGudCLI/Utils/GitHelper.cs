@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using CliWrap;
 using CliWrap.Buffered;
+using ConsoleHelper;
 using GitGudCLI.Response;
 using GitGudCLI.Structure;
 
@@ -168,24 +170,7 @@ namespace GitGudCLI.Utils
 			return new GitResponse(true, EnumGitResponse.NONE,
 				$"Branch {branchName} created successfully\n{output.Message}");
 		}
-
-		public GitResponse CreateEmptyBranchChekout(string branchName)
-		{
-			Refresh();
-
-			if (LocalBranches.Contains(branchName))
-				return new GitResponse(false, EnumGitResponse.BRANCH_ALREADY_EXISTS,
-					$"The branch {branchName} already exists.");
-
-			var output = ExecuteGitCommand($"checkout --orphan {branchName}");
-
-			if (output.Success)
-				_needsRefresh = true;
-
-			return new GitResponse(true, EnumGitResponse.NONE,
-				$"{output.Message}\nBranch {branchName} created successfully.");
-		}
-
+		
 		public GitResponse DeleteBranch(string branchName)
 		{
 			Refresh();
@@ -231,7 +216,15 @@ namespace GitGudCLI.Utils
 			if (!response.Success)
 				return response;
 
-			return ExecuteGitCommand($"merge {fromBranch}");
+			response = ExecuteGitCommand($"merge {fromBranch}");
+			if (!response.Success)
+			{
+				ColorConsole.WriteError("Merge failed, aborting !");
+				var abortResponse = ExecuteGitCommand("merge --abort");
+				return new(false, EnumGitResponse.FATAL_ERROR, $"{response.Message}\n{abortResponse.Message}");
+			}
+
+			return response;
 		}
 
 		public GitResponse PushBranchToOrigin(string branchName)
