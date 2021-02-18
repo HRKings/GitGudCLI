@@ -12,8 +12,4 @@
     <PackageReference Include="Sharprompt" Version="2.1.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Options" />
-  </ItemGroup>
-
 </Project>

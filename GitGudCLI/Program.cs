@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Immutable;
-using System.Linq;
 using ConsoleHelper;
-using GitGudCLI.Modules;
-using GitGudCLI.Response;
-using GitGudCLI.Structure;
 using GitGudCLI.Utils;
-using Sharprompt;
 
 namespace GitGudCLI
 {
