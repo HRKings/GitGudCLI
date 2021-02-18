@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using ConsoleHelper;
 using GitGudCLI.Modules;
+using GitGudCLI.Response;
 using GitGudCLI.Utils;
 using Sharprompt;
 
@@ -10,218 +11,143 @@ namespace GitGudCLI.Options
 {
 	public static class CommitCommands
 	{
+		private static CommitOptions _options;
+		private static GitHelper _helper;
+		private static GitResponse _response;
+
+		private static string _tag;
+		private static string[] _flags;
+
 		public static int Run(CommitOptions options, GitHelper helper)
 		{
+			_options = options;
+			_helper = helper;
+			
+			if (!helper.HasRepo)
+			{
+				ColorConsole.WriteError("There is no repository");
+				return 1;
+			}
+			
+			_tag =  Prompt.Select("Select the commit tag: ", Constants.CommitTagsWithDescriptions[..^1])
+				.Split(':', StringSplitOptions.TrimEntries)[0];
+			_flags = Prompt.MultiSelect("Select the flags for this commit: ", 
+					Constants.CommitFlagsWithDescriptions, pageSize: 7, minimum: 0)
+				.OrderBy(flag => flag).Select(flag => flag.Split(':', StringSplitOptions.TrimEntries)[0]).ToArray();
+			Console.Write(new string('\n', _flags.Length));
+			
+			if (string.IsNullOrWhiteSpace(options.Message))
+				_options.Message = Prompt.Input<string>("Please provide a commit message:");
+			
 			switch (options.Mode)
 			{
 				case "quickadd":
 				case "qa":
-					return QuickCommit(options.Message, true, helper);
+					Commit(true, false);
+					break;
 
 				case "commit":
 				case "c":
-					return QuickCommit(options.Message, false, helper);
+					Commit(false, false);
+					break;
 
 				case "fullcommit":
 				case "fc":
-					return FullCommit(options.Message, helper);
+					Commit(false, true);
+					break;
 
-				case "commitlint":
-				case "cmli":
-					return ValidateCommit(options.Message);
+				case "lint":
+				case "lnt":
+					CommitMessageLinter toValidate = new(_options.Message);
+					toValidate.WriteReport();
+					return 0;
 
-
-				case "commitgen":
-				case "cmgn":
-					return GenerateValidCommit(options.Message);
+				case "generate":
+				case "gen":
+					string message = GenerateCommitMessage(false, false, false, false);
+					if (string.IsNullOrWhiteSpace(message))
+					{
+						ColorConsole.WriteError("There was an error generating the commit message.");
+						return 1;
+					}
+						
+					ColorConsole.WriteWrappedHeader("Your commit message:");
+					ColorConsole.WriteInfo(message);
+					return 0;
 			}
 
-			return 0;
-		}
-		
-		private static int QuickCommit(string commitMessage, bool fullAdd, GitHelper helper)
-		{
-			if (!helper.HasRepo)
+			if (!_response.Success)
 			{
-				ColorConsole.WriteError("There is no repository");
+				ColorConsole.WriteError(_response.Message);
 				return 1;
 			}
-			
-			var response = helper.CanCommit(true, true && fullAdd);
-			if (!response.Success)
+
+			ColorConsole.WriteSuccess($"{_response.Message}\nCommit made successfully.");
+			return 0;
+		}
+
+		private static string GenerateCommitMessage(bool completeCommit, bool allowChanges, bool fullAdd, bool validate = true)
+		{
+			var response = _helper.CanCommit(allowChanges, fullAdd);
+			if (validate && !response.Success)
 			{
 				ColorConsole.WriteError(response.Message);
-				return 1;
+				return string.Empty;
+			}
+
+			var commitBody = string.Empty;
+			string[] closedIssues = null;
+			string[] seeAlso = null;
+			if (completeCommit)
+			{
+				ColorConsole.WriteWrappedHeader("Enter the commit body (Optional):");
+				commitBody = Console.ReadLine();
+
+				ColorConsole.WriteWrappedHeader("Enter the closed issues, comma separated (Optional):");
+				closedIssues = Console.ReadLine()
+					?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+				ColorConsole.WriteWrappedHeader("Enter the 'see also' issues, comma separated (Optional):");
+				seeAlso = Console.ReadLine()
+					?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 			}
 			
-			string tag =  Prompt.Select("Select the commit tag: ", Constants.CommitTagsWithDescriptions[..^1])
-				.Split(':', StringSplitOptions.TrimEntries)[0];
-
-			var flags = Prompt.MultiSelect("Select the flags for this commit: ", 
-					Constants.CommitFlagsWithDescriptions, pageSize: 7, minimum: 0)
-				.OrderBy(flag => flag).Select(flag => flag.Split(':', StringSplitOptions.TrimEntries)[0]);
-
-			if (string.IsNullOrWhiteSpace(commitMessage))
-			{
-				ColorConsole.WriteWrappedHeader("Please provide a commit message:");
-				commitMessage = Console.ReadLine();
-			}
-
-			var commitAdd = 0;
-			if (!fullAdd)
-			{
-				ColorConsole.WriteWrappedHeader("Commit mode:");
-				commitAdd = CLIHelper.MenuChoice(false, new[] {"Equivalent to 'git commit -am", "A plain 'git commit'"},
-					"Commit Add", "Just Commit");
-			}
-
 			CommitMessageGenerator generator = new()
 			{
-				Tag = tag,
-				Flags = flags as string[],
-				Subject = commitMessage
-			};
-
-			var commit = generator.GenerateValidCommitMessage();
-
-			if (commit is null)
-			{
-				ColorConsole.WriteError("There was an error generating the commit message.");
-			}
-			else
-			{
-				if (fullAdd)
-				{
-					response = helper.CommitFullAdd(commit.CommitMessage);
-				}
-				else
-				{
-					response = commitAdd == 0 ? helper.CommitAdd(commit.CommitMessage) : helper.Commit(commit.CommitMessage);
-				}
-
-				if (response.Success)
-					ColorConsole.WriteSuccess($"{response.Message}\nCommit made successfully.");
-				else
-					ColorConsole.WriteError(response.Message);
-			}
-
-			return 0;
-		}
-		
-		public static int ValidateCommit(string commit)
-		{
-			if (string.IsNullOrWhiteSpace(commit))
-			{
-				Console.WriteLine("Please provide a commit message: ");
-				commit = Console.ReadLine();
-			}
-
-			CommitMessageLinter toValidate = new(commit);
-
-			toValidate.WriteReport();
-
-			return 0;
-		}
-		
-		private static int FullCommit(string commitMessage, GitHelper helper)
-		{
-			if (!helper.HasRepo)
-			{
-				ColorConsole.WriteError("There is no repository");
-				return 1;
-			}
-
-			var response = helper.CanCommit();
-			if (!response.Success)
-			{
-				ColorConsole.WriteError(response.Message);
-				return 1;
-			}
-			
-			string tag =  Prompt.Select("Select the commit tag: ", Constants.CommitTagsWithDescriptions[..^1])
-				.Split(':', StringSplitOptions.TrimEntries)[0];
-
-			var flags = Prompt.MultiSelect("Select the flags for this commit: ", 
-					Constants.CommitFlagsWithDescriptions, pageSize: 7, minimum: 0)
-				.OrderBy(flag => flag).Select(flag => flag.Split(':', StringSplitOptions.TrimEntries)[0]);
-
-			if (string.IsNullOrWhiteSpace(commitMessage))
-			{
-				ColorConsole.WriteWrappedHeader("Please provide a commit message:");
-				commitMessage = Console.ReadLine();
-			}
-
-			ColorConsole.WriteWrappedHeader("Enter the commit body (Optional):");
-			string commitBody = Console.ReadLine();
-
-			ColorConsole.WriteWrappedHeader("Enter the closed issues, comma separated (Optional):");
-			string[] closedIssues = Console.ReadLine()
-				?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-			ColorConsole.WriteWrappedHeader("Enter the 'see also' issues, comma separated (Optional):");
-			string[] seeAlso = Console.ReadLine()
-				?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-			ColorConsole.WriteWrappedHeader("Commit mode:");
-			int commitAdd = CLIHelper.MenuChoice(false, new[] {"Equivalent to 'git commit -am", "A plain 'git commit'"},
-				"Commit Add", "Just Commit");
-
-			CommitMessageGenerator generator = new()
-			{
-				Tag = tag,
-				Flags = flags as string[],
-				Subject = commitMessage,
+				Tag = _tag,
+				Flags = _flags,
+				Subject = _options.Message,
 				Body = commitBody,
 				ClosedIssues = closedIssues,
 				SeeAlso = seeAlso
 			};
 
-			var commit = generator.GenerateValidCommitMessage();
-
-			if (commit is null)
-			{
-				ColorConsole.WriteError("There was an error generating the commit message.");
-			}
-			else
-			{
-				response = commitAdd == 0 ? helper.CommitAdd(commit.CommitMessage) : helper.Commit(commit.CommitMessage);
-
-				if (response.Success)
-					ColorConsole.WriteSuccess($"{response.Message}\nCommit made successfully.");
-				else
-					ColorConsole.WriteError(response.Message);
-			}
-
-			return 0;
+			return generator.GenerateValidCommitMessage().CommitMessage;
 		}
 		
-		private static int GenerateValidCommit(string message)
+		private static void Commit(bool fullAdd, bool isComplete)
 		{
-			if (string.IsNullOrWhiteSpace(message))
+			var commitMode = string.Empty;
+			if (!fullAdd)
 			{
-				ColorConsole.WriteWrappedHeader("Please provide a commit subject: ");
-				message = Console.ReadLine();
+				commitMode = Prompt.Select("Commit command:", 
+					new[] {"git commit -am", "git commit"}, defaultValue: "git commit -am");
 			}
 
-			string tag =  Prompt.Select("Select the commit tag: ", Constants.CommitTagsWithDescriptions[..^1])
-				.Split(':', StringSplitOptions.TrimEntries)[0];
-
-			var flags = Prompt.MultiSelect("Select the flags for this commit: ", 
-					Constants.CommitFlagsWithDescriptions, pageSize: 7, minimum: 0)
-				.OrderBy(flag => flag).Select(flag => flag.Split(':', StringSplitOptions.TrimEntries)[0]);
-
-			CommitMessageGenerator generator = new()
+			string commitMessage = GenerateCommitMessage(isComplete, true, fullAdd);
+			if (commitMessage is null)
 			{
-				Tag = tag,
-				Flags = flags as string[],
-				Subject = message
-			};
-
-			ColorConsole.WriteWrappedHeader("Your commit message:");
-
-			Console.WriteLine(generator.GenerateValidCommitMessage().CommitMessage);
-
-			return 0;
+				ColorConsole.WriteError("There was an error generating the commit message.");
+				return;
+			}
+			
+			if (fullAdd)
+			{
+				_response = _helper.CommitFullAdd(commitMessage);
+				return;
+			}
+			
+			_response = commitMode is "git commit -am" ? _helper.CommitAdd(commitMessage) : _helper.Commit(commitMessage);
 		}
 	}
 }
