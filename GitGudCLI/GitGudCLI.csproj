@@ -3,6 +3,12 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <PackageId>HRKings.GitGudCLI</PackageId>
+    <Title>GitGudCLI</Title>
+    <Authors>HRKings</Authors>
+    <Description>A CLI for the GitGud model</Description>
+    <RepositoryUrl>https://github.com/HRKings/GitGudCLI</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
