@@ -74,6 +74,10 @@ namespace GitGudCLI.Commands
 					ColorConsole.WriteWrappedHeader("Your commit message:");
 					ColorConsole.WriteInfo(message);
 					return 0;
+				
+				default:
+					ColorConsole.WriteError($"The mode '{options.Mode}' is not valid.");
+					return 1;
 			}
 
 			if (!_response.Success)

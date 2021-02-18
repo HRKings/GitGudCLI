@@ -53,7 +53,7 @@ namespace GitGudCLI.Commands
 					break;
 				
 				default:
-					ColorConsole.WriteError($"Action {_options.Action} is not valid.");
+					ColorConsole.WriteError($"Action '{_options.Action}' is not valid.");
 					return 1;
 			}
 
