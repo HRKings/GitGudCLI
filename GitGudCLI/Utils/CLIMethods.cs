@@ -226,36 +226,25 @@ namespace GitGudCLI.Utils
 
 				case "start":
 					if (string.IsNullOrWhiteSpace(argument2))
-					{
-						ColorConsole.WriteWrappedHeader("Please provide a branch name:");
-						argument2 = Console.ReadLine();
-					}
+						argument2 = Prompt.Input<string>("Please provide a branch name:");
 
-					ColorConsole.WriteWrappedHeader(
-						"Navigate the branch types with the arrow keys and select using enter:");
-					string type = Constants.ValidWorkingBranchTypes[
-						CLIHelper.MenuChoice(false, Constants.ValidWorkingBranchTypeDescriptions,
-							Constants.ValidWorkingBranchTypes)];
+					string type = Prompt.Select("Select the branch type: ", Constants.ValidWorkingBranchTypeWithDescriptions[..^1])
+						.Split(':', StringSplitOptions.TrimEntries)[0];
 
 					response = flow.Start(argument2, type);
 					break;
 
 				case "publish":
 					if (string.IsNullOrWhiteSpace(argument2))
-					{
-						ColorConsole.WriteWrappedHeader("Please provide a branch name:");
-						argument2 = Console.ReadLine();
-					}
+						argument2 = Prompt.Input<string>("Please provide a branch name:");
 
 					response = flow.Publish(argument2);
 					break;
 
 				case "complete":
 					if (string.IsNullOrWhiteSpace(argument2))
-					{
-						ColorConsole.WriteWrappedHeader("Please provide a branch name:");
-						argument2 = Console.ReadLine();
-					}
+						argument2 = Prompt.Input<string>("Please provide a branch name:");
+					
 
 					response = flow.Complete(argument2);
 					break;
