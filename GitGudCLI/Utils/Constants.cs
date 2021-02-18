@@ -53,10 +53,10 @@
 
 		public static readonly string[] ValidWorkingBranchTypeWithDescriptions =
 		{
-			"wip    : Receive direct commits and can be freely edited by the developers.",
-			"fix    : Used to fix bugs or missing resources found in the master branch.",
-			"chore  : Only used when updating dependencies, frameworks, build tasks and other updates required.",
-			"hotfix : A priority fix for when you find a serious bug in the stable branch that needs to be resolved ASAP."
+			"wip/    : Receive direct commits and can be freely edited by the developers.",
+			"fix/    : Used to fix bugs or missing resources found in the master branch.",
+			"chore/  : Only used when updating dependencies, frameworks, build tasks and other updates required.",
+			"hotfix/ : A priority fix for when you find a serious bug in the stable branch that needs to be resolved ASAP."
 		};
 	}
 }
