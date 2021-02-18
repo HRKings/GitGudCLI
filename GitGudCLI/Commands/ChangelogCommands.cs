@@ -25,7 +25,7 @@ namespace GitGudCLI.Commands
 				return 1;
 			}
 			
-			//ColorConsole.WriteInfo(changelog);
+			ColorConsole.WriteInfo(changelog);
 			return 0;
 		}
 	}

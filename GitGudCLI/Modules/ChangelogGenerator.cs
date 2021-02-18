@@ -58,7 +58,7 @@ namespace GitGudCLI.Modules
 				changelog += $"### Deprecated\n{string.Join('\n', deprecated)}\n\n";
 			
 			if (removed.Count != 0)
-				changelog += $"### Deprecated\n{string.Join('\n', removed)}\n\n";
+				changelog += $"### Removed\n{string.Join('\n', removed)}\n\n";
 			
 			return changelog.TrimEnd('\n');
 		}
