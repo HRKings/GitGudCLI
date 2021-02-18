@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ConsoleHelper;
 using GitGudCLI.Utils;
@@ -7,8 +8,12 @@ namespace GitGudCLI.Modules
 {
 	public class ChangelogGenerator
 	{
-		public static string GenerateSince(string startDate) => Generate(GitHelper.GetCommitSubjectsSince(startDate));
-		
+		public static string GenerateSince(string startDate)
+		{
+			var commits = GitHelper.GetCommitSubjectsSince(startDate).ToList();
+			return commits.Count == 0 ? null : Generate(commits);
+		}
+
 		public static string Generate(IEnumerable<string> commitMessages)
 		{
 			var messageList = commitMessages?.ToList();
@@ -23,11 +28,11 @@ namespace GitGudCLI.Modules
 			
 			var added = lintedMessages.Where(message => message.IsValid && message.Tag is "feature").Select(linter => linter.Subject).ToList();
 			var changed = lintedMessages.Where(message => message.IsValid && message.Tag is "change").Select(linter => linter.Subject).ToList();
-			var breakingChanges = lintedMessages.Where(message => message.IsValid && message.Flags.Contains("!!!")).Select(linter => linter.Subject).ToList();
+			var breakingChanges = lintedMessages.Where(message => message.IsValid && message.HasFlags && message.Flags.Contains("!!!")).Select(linter => linter.Subject).ToList();
 			var fixes = lintedMessages.Where(message => message.IsValid && message.Tag is "fix").Select(linter => linter.Subject).ToList();
 			var updated = lintedMessages.Where(message => message.IsValid && message.Tag is "chore").Select(linter => linter.Subject).ToList();
-			var deprecated = lintedMessages.Where(message => message.IsValid && message.Flags.Contains("dpc")).Select(linter => linter.Subject).ToList();
-			var removed = lintedMessages.Where(message => message.IsValid && message.Flags.Contains("rm")).Select(linter => linter.Subject).ToList();
+			var deprecated = lintedMessages.Where(message => message.IsValid && message.HasFlags && message.Flags.Contains("dpc")).Select(linter => linter.Subject).ToList();
+			var removed = lintedMessages.Where(message => message.IsValid && message.HasFlags && message.Flags.Contains("rm")).Select(linter => linter.Subject).ToList();
 
 			var changelog = string.Empty;
 
