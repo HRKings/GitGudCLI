@@ -46,8 +46,8 @@ namespace GitGudCLI.Commands
 					Commit(true, false);
 					break;
 
-				case "commit":
-				case "c":
+				case "plain":
+				case "p":
 					Commit(false, false);
 					break;
 
