@@ -10,8 +10,8 @@ namespace GitGudCLI.Modules
 {
 	public class CommitMessageLinter
 	{
-		private readonly Regex _headerRegex = new(Constants.HeaderValidationRegex, RegexOptions.Compiled | RegexOptions.Multiline);
-		private readonly Regex _footerRegex = new(Constants.FooterValidationRegex, RegexOptions.Compiled | RegexOptions.Multiline);
+		private readonly Regex _headerRegex = new(Constants.HeaderValidationRegex, RegexOptions.Compiled);
+		private readonly Regex _footerRegex = new(Constants.FooterValidationRegex, RegexOptions.Compiled);
 
 		private EnumCommitError _errors;
 		private EnumCommitWarning _warnings;
@@ -97,8 +97,8 @@ namespace GitGudCLI.Modules
 				: string.Empty;
 
 			// If it has a subject, save it, if not save an empty string
-			Subject = header.Groups["subject"].Value;
-
+			Subject = HasSubject ? header.Groups["subject"].Value : string.Empty;
+			
 			// If it has a body, save it, if not save an empty string
 			Body =  HasBody ? messageSplit[1] : string.Empty;
 
