@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using ConsoleHelper;
 using GitGudCLI.Modules;
 using GitGudCLI.Options;
 using GitGudCLI.Response;

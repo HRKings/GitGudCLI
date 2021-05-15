@@ -14,8 +14,8 @@
   <ItemGroup>
     <PackageReference Include="CliWrap" Version="3.3.0" />
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
-    <PackageReference Include="Rhaizzing.ConsoleHelper" Version="1.1.4" />
     <PackageReference Include="Sharprompt" Version="2.1.2" />
+    <PackageReference Include="Spectre.Console" Version="0.39.1-preview.0.20" />
   </ItemGroup>
 
 </Project>

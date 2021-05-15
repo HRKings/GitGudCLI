@@ -1,9 +1,6 @@
-﻿using System;
-using CommandLine;
-using ConsoleHelper;
+﻿using CommandLine;
 using GitGudCLI.Commands;
 using GitGudCLI.Options;
-using GitGudCLI.Response;
 using GitGudCLI.Utils;
 
 namespace GitGudCLI

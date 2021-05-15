@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using ConsoleHelper;
 using GitGudCLI.Structure;
 using GitGudCLI.Utils;
 

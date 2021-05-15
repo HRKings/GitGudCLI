@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using CliWrap;
 using CliWrap.Buffered;
-using ConsoleHelper;
 using GitGudCLI.Response;
 using GitGudCLI.Structure;
 
