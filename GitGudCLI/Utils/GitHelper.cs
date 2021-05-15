@@ -216,7 +216,7 @@ namespace GitGudCLI.Utils
 			response = ExecuteGitCommand($"merge {fromBranch}");
 			if (!response.Success)
 			{
-				ColorConsole.WriteError("Merge failed, aborting !");
+				SpectreHelper.WriteError("Merge failed, aborting !");
 				var abortResponse = ExecuteGitCommand("merge --abort");
 				return new(false, EnumGitResponse.FATAL_ERROR, $"{response.Message}\n{abortResponse.Message}");
 			}

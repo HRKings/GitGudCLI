@@ -10,7 +10,7 @@ namespace GitGudCLI.Commands
 		{
 			if (!Regex.Match(options.StartDate, @"\d{4}-\d{2}-\d{2}").Success)
 			{
-				ColorConsole.WriteError("The date is invalid");
+				SpectreHelper.WriteError("The date is invalid");
 				return 1;
 			}
 			
@@ -18,11 +18,11 @@ namespace GitGudCLI.Commands
 
 			if (string.IsNullOrWhiteSpace(changelog))
 			{
-				ColorConsole.WriteError("There were no commits to generate the changelog from.");
+				SpectreHelper.WriteError("There were no commits to generate the changelog from.");
 				return 1;
 			}
 			
-			ColorConsole.WriteInfo(changelog);
+			SpectreHelper.WriteInfo(changelog);
 			return 0;
 		}
 	}

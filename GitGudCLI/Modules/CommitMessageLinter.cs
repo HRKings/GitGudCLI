@@ -190,45 +190,45 @@ namespace GitGudCLI.Modules
 			byte warningsFound = 0;
 
 			if (!IsValid)
-				ColorConsole.WriteError("✘ The commit is not valid.");
+				SpectreHelper.WriteError("✘ The commit is not valid.");
 			else
-				ColorConsole.WriteSuccess("✓ The commit is valid.");
+				SpectreHelper.WriteSuccess("✓ The commit is valid.");
 
 			if (_errors != EnumCommitError.NONE)
 			{
 				if (_errors.HasFlag(EnumCommitError.NO_TAG))
 				{
-					ColorConsole.WriteError("✘ The commit has no tag.");
+					SpectreHelper.WriteError("✘ The commit has no tag.");
 					errorsFound++;
 				}
 
 				if (_errors.HasFlag(EnumCommitError.NO_SUBJECT))
 				{
-					ColorConsole.WriteError("✘ The commit has no subject.");
+					SpectreHelper.WriteError("✘ The commit has no subject.");
 					errorsFound++;
 				}
 
 				if (_errors.HasFlag(EnumCommitError.FLAG))
 				{
-					ColorConsole.WriteError("✘ The flags are not valid.");
+					SpectreHelper.WriteError("✘ The flags are not valid.");
 					errorsFound++;
 				}
 
 				if (_errors.HasFlag(EnumCommitError.CLOSED_ISSUES))
 				{
-					ColorConsole.WriteError("✘ The closed issues section is not valid.");
+					SpectreHelper.WriteError("✘ The closed issues section is not valid.");
 					errorsFound++;
 				}
 
 				if (_errors.HasFlag(EnumCommitError.SEE_ALSO))
 				{
-					ColorConsole.WriteError("✘ The see also section is not valid.");
+					SpectreHelper.WriteError("✘ The see also section is not valid.");
 					errorsFound++;
 				}
 
 				if (_errors.HasFlag(EnumCommitError.INVALID_TAG))
 				{
-					ColorConsole
+					SpectreHelper
 						.WriteError(
 							$"✘ The tag must be one of following: {string.Join(", ", Constants.ValidCommitTags)}.");
 					errorsFound++;
@@ -236,7 +236,7 @@ namespace GitGudCLI.Modules
 
 				if (_errors.HasFlag(EnumCommitError.INVALID_FLAG))
 				{
-					ColorConsole.WriteError(
+					SpectreHelper.WriteError(
 						$"✘ The tag must be one of following: {string.Join(", ", Constants.ValidCommitFlags)}.");
 					errorsFound++;
 				}
@@ -246,7 +246,7 @@ namespace GitGudCLI.Modules
 			{
 				if (_warnings.HasFlag(EnumCommitWarning.SUBJECT_TOO_LONG))
 				{
-					ColorConsole.WriteWarning(
+					SpectreHelper.WriteWarning(
 						"⚠ The subject is too long, the maximum recommended length is 80 characters long.");
 					warningsFound++;
 				}
@@ -255,13 +255,13 @@ namespace GitGudCLI.Modules
 					_warnings.HasFlag(EnumCommitWarning.BREAKING_CHANGE_IS_NOT_THE_FIRST_FLAG)
 				)
 				{
-					ColorConsole.WriteWarning(
+					SpectreHelper.WriteWarning(
 						"⚠ The commit has the breaking-change flag {!!!} but it is not the first flag.");
 					warningsFound++;
 				}
 			}
 
-			ColorConsole.WriteInfo($"🛈 Found {errorsFound} errors and {warningsFound} warnings.");
+			SpectreHelper.WriteInfo($"🛈 Found {errorsFound} errors and {warningsFound} warnings.");
 		}
 	}
 }

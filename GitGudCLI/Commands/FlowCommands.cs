@@ -22,7 +22,7 @@ namespace GitGudCLI.Commands
 			
 			if (!helper.HasRepo && _options.Action is not "fullinit")
 			{
-				ColorConsole.WriteError("There is no repository");
+				SpectreHelper.WriteError("There is no repository");
 				return 1;
 			}
 
@@ -52,23 +52,23 @@ namespace GitGudCLI.Commands
 					break;
 				
 				default:
-					ColorConsole.WriteError($"Action '{_options.Action}' is not valid.");
+					SpectreHelper.WriteError($"Action '{_options.Action}' is not valid.");
 					return 1;
 			}
 
 			if (!_response.Success)
 			{
-				ColorConsole.WriteError(_response.Message);
+				SpectreHelper.WriteError(_response.Message);
 				return 1;
 			}
 
 			if (_response.GitReponse is not EnumGitResponse.NONE)
 			{
-				ColorConsole.WriteWarning(_response.Message);
+				SpectreHelper.WriteWarning(_response.Message);
 				return 0;
 			}
 				
-			ColorConsole.WriteSuccess(_response.Message); 
+			SpectreHelper.WriteSuccess(_response.Message); 
 			return 0;
 		}
 
@@ -77,7 +77,7 @@ namespace GitGudCLI.Commands
 			var createResponse = gitHelper.CreateRepository();
 			if (!createResponse.Success)
 			{
-				ColorConsole.WriteError(createResponse.Message);
+				SpectreHelper.WriteError(createResponse.Message);
 				return;
 			}
 

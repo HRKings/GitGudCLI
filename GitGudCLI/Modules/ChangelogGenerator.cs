@@ -18,7 +18,7 @@ namespace GitGudCLI.Modules
 			
 			if (messageList is null || messageList.Count == 0)
 			{
-				ColorConsole.WriteError("No commits were provided.");
+				SpectreHelper.WriteError("No commits were provided.");
 				return null;
 			}
 
