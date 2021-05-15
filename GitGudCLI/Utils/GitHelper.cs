@@ -49,9 +49,12 @@ namespace GitGudCLI.Utils
 
 		public static GitResponse ExecuteGitCommand(string command)
 		{
-			var commandResult = Cli.Wrap("git").WithArguments(command).ExecuteBufferedAsync().GetAwaiter().GetResult();
-			
-			if (!string.IsNullOrWhiteSpace(commandResult.StandardError) && !commandResult.StandardError.StartsWith("warning:"))
+			var commandResult = Cli.Wrap("git").WithArguments(command)
+				.WithValidation(CommandResultValidation.None).ExecuteBufferedAsync().GetAwaiter().GetResult();
+
+			if (commandResult.ExitCode != 0 
+			    && !string.IsNullOrWhiteSpace(commandResult.StandardError) 
+			    && !commandResult.StandardError.StartsWith("warning:"))
 			{
 				if (commandResult.StandardError.StartsWith("fatal"))
 					return new GitResponse(false, EnumGitResponse.FATAL_ERROR, $"{commandResult.StandardOutput}{commandResult.StandardError}");
