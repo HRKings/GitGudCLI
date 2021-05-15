@@ -7,6 +7,9 @@ namespace GitGudCLI.Utils
         public static void WriteError(string message)
             => AnsiConsole.MarkupLine($"[red]{message}[/]");
         
+        public static void WriteWarning(string message)
+            => AnsiConsole.MarkupLine($"[yellow]{message}[/]");
+        
         public static void WriteSuccess(string message)
             => AnsiConsole.MarkupLine($"[green]{message}[/]");
 

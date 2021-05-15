@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using GitGudCLI.Modules;
 using GitGudCLI.Options;
+using GitGudCLI.Utils;
 
 namespace GitGudCLI.Commands
 {
