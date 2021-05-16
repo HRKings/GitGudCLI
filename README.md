@@ -4,23 +4,23 @@
 
 This repository is crossplatform CLI (Command Line Interface) for the [GitGud](https://github.com/HRKings/GitGud/tree/stable) modular git model. It contains a series of commands that help you use git more quickly and following the model.
 
-* [GitGud CLI](#gitgud-cli)
-	* [Installation](#installation)
-	* [Usage](#usage)
-		* [Commit Module](#commit-module)
-			* [Quickadd commit](#quickadd-commit)
-			* [Plain commit](#plain-commit)
-			* [Full commit](#full-commit)
-			* [Lint](#lint)
-			* [Generate](#generate)
-		* [Flow Module](#flow-module)
-			* [Full Init](#full-init)
-			* [Init](#init)
-			* [Start](#start)
-			* [Publish](#publish)
-			* [Complete](#complete)
-	* [Compiling](#compiling)
-	* [Contributing](#contributing)
+- [GitGud CLI](#gitgud-cli)
+	- [Installation](#installation)
+	- [Usage](#usage)
+		- [Commit Module](#commit-module)
+			- [Quickadd commit](#quickadd-commit)
+			- [Plain commit](#plain-commit)
+			- [Full commit](#full-commit)
+			- [Lint](#lint)
+			- [Generate](#generate)
+		- [Flow Module](#flow-module)
+			- [Full Init](#full-init)
+			- [Init](#init)
+			- [Start](#start)
+			- [Publish](#publish)
+			- [Complete](#complete)
+	- [Compiling](#compiling)
+	- [Contributing](#contributing)
 
 ## Installation
 
@@ -88,7 +88,7 @@ gitgud g "Commit subject"
 
 ### Flow Module
 
-The Flow module is a wrapper to the [Flow submodel](https://github.com/HRKings/GitGud/blob/master/Flow/GitGud_Flow.md), and its commands are equivalent to the (how to)[https://github.com/HRKings/GitGud/blob/master/Flow/GitGud_Flow_HowTo.md] provided in the model.
+The Flow module is a wrapper to the [Flow submodel](https://github.com/HRKings/GitGud/blob/master/Flow/GitGud_Flow.md), and its commands are equivalent to the [how to](https://github.com/HRKings/GitGud/blob/master/Flow/GitGud_Flow_HowTo.md) provided in the model.
 
 #### Full Init
 
@@ -119,7 +119,7 @@ gitgud flow start "branch-name"
 This command is for when you are working locally and need to push your branch in the internet. When provided a branch type and name, will push the branch to the origin.
 
 ```Bash
-gitgud flow start "type/branch-name"
+gitgud flow publish "type/branch-name"
 ```
 
 #### Complete
