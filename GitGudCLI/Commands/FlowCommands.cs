@@ -26,7 +26,7 @@ namespace GitGudCLI.Commands
 				return 1;
 			}
 
-			if (string.IsNullOrWhiteSpace(_options.BranchName) && _options.Action is not "init" or "fullinit")
+			if (string.IsNullOrWhiteSpace(_options.BranchName) && _options.Action is not ("init" or "fullinit"))
 				_options.BranchName = Prompt.Select("Please select a branch", helper.LocalBranches);
 
 			switch (_options.Action)
@@ -62,6 +62,8 @@ namespace GitGudCLI.Commands
 				return 1;
 			}
 
+			Console.WriteLine(_response.GitReponse);
+			
 			if (_response.GitReponse is not EnumGitResponse.NONE)
 			{
 				SpectreHelper.WriteWarning(_response.Message);
@@ -77,7 +79,8 @@ namespace GitGudCLI.Commands
 			var createResponse = gitHelper.CreateRepository();
 			if (!createResponse.Success)
 			{
-				SpectreHelper.WriteError(createResponse.Message);
+				_response = new FlowResponse(createResponse.Success, EnumFlowResponse.GIT_ERROR,
+					createResponse.Response, createResponse.Message);
 				return;
 			}
 
