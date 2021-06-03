@@ -1,9 +1,6 @@
-﻿using System;
-using CommandLine;
-using ConsoleHelper;
+﻿using CommandLine;
 using GitGudCLI.Commands;
 using GitGudCLI.Options;
-using GitGudCLI.Response;
 using GitGudCLI.Utils;
 
 namespace GitGudCLI
@@ -16,9 +13,10 @@ namespace GitGudCLI
 		{
 			_gitHelper = new GitHelper();
 			
-			Parser.Default.ParseArguments<CommitOptions, FlowOptions>(args)
+			Parser.Default.ParseArguments<CommitOptions, FlowOptions, ChangelogOptions>(args)
 				.WithParsed<CommitOptions>(options => CommitCommands.Run(options, _gitHelper))
-				.WithParsed<FlowOptions>(options => FlowCommands.Run(options, _gitHelper));
+				.WithParsed<FlowOptions>(options => FlowCommands.Run(options, _gitHelper))
+				.WithParsed<ChangelogOptions>(options => ChangelogCommands.Run(options));
 
 			return 0;
 		}

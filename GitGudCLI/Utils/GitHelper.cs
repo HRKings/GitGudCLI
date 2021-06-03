@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using CliWrap;
 using CliWrap.Buffered;
-using ConsoleHelper;
 using GitGudCLI.Response;
 using GitGudCLI.Structure;
 
@@ -52,9 +49,12 @@ namespace GitGudCLI.Utils
 
 		public static GitResponse ExecuteGitCommand(string command)
 		{
-			var commandResult = Cli.Wrap("git").WithArguments(command).ExecuteBufferedAsync().GetAwaiter().GetResult();
-			
-			if (!string.IsNullOrWhiteSpace(commandResult.StandardError) && !commandResult.StandardError.StartsWith("warning:"))
+			var commandResult = Cli.Wrap("git").WithArguments(command)
+				.WithValidation(CommandResultValidation.None).ExecuteBufferedAsync().GetAwaiter().GetResult();
+
+			if (commandResult.ExitCode != 0 
+			    && !string.IsNullOrWhiteSpace(commandResult.StandardError) 
+			    && !commandResult.StandardError.StartsWith("warning:"))
 			{
 				if (commandResult.StandardError.StartsWith("fatal"))
 					return new GitResponse(false, EnumGitResponse.FATAL_ERROR, $"{commandResult.StandardOutput}{commandResult.StandardError}");
@@ -219,7 +219,7 @@ namespace GitGudCLI.Utils
 			response = ExecuteGitCommand($"merge {fromBranch}");
 			if (!response.Success)
 			{
-				ColorConsole.WriteError("Merge failed, aborting !");
+				SpectreHelper.WriteError("Merge failed, aborting !");
 				var abortResponse = ExecuteGitCommand("merge --abort");
 				return new(false, EnumGitResponse.FATAL_ERROR, $"{response.Message}\n{abortResponse.Message}");
 			}

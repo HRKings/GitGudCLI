@@ -1,5 +1,4 @@
 ﻿using System;
-using ConsoleHelper;
 using GitGudCLI.Modules;
 using GitGudCLI.Options;
 using GitGudCLI.Response;
@@ -23,12 +22,12 @@ namespace GitGudCLI.Commands
 			
 			if (!helper.HasRepo && _options.Action is not "fullinit")
 			{
-				ColorConsole.WriteError("There is no repository");
+				SpectreHelper.WriteError("There is no repository");
 				return 1;
 			}
-			
-			if (string.IsNullOrWhiteSpace(_options.BranchName) && _options.Action is not "init" or "fullinit")
-				_options.BranchName = Prompt.Input<string>("Please provide a branch name:");
+
+			if (string.IsNullOrWhiteSpace(_options.BranchName) && _options.Action is not ("init" or "fullinit"))
+				_options.BranchName = Prompt.Select("Please select a branch", helper.LocalBranches);
 
 			switch (_options.Action)
 			{
@@ -53,23 +52,25 @@ namespace GitGudCLI.Commands
 					break;
 				
 				default:
-					ColorConsole.WriteError($"Action '{_options.Action}' is not valid.");
+					SpectreHelper.WriteError($"Action '{_options.Action}' is not valid.");
 					return 1;
 			}
 
 			if (!_response.Success)
 			{
-				ColorConsole.WriteError(_response.Message);
+				SpectreHelper.WriteError(_response.Message);
 				return 1;
 			}
 
+			Console.WriteLine(_response.GitReponse);
+			
 			if (_response.GitReponse is not EnumGitResponse.NONE)
 			{
-				ColorConsole.WriteWarning(_response.Message);
+				SpectreHelper.WriteWarning(_response.Message);
 				return 0;
 			}
 				
-			ColorConsole.WriteSuccess(_response.Message); 
+			SpectreHelper.WriteSuccess(_response.Message); 
 			return 0;
 		}
 
@@ -78,7 +79,8 @@ namespace GitGudCLI.Commands
 			var createResponse = gitHelper.CreateRepository();
 			if (!createResponse.Success)
 			{
-				ColorConsole.WriteError(createResponse.Message);
+				_response = new FlowResponse(createResponse.Success, EnumFlowResponse.GIT_ERROR,
+					createResponse.Response, createResponse.Message);
 				return;
 			}
 

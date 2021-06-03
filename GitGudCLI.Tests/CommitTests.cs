@@ -6,6 +6,14 @@ namespace GitGudCLI.Tests
 	public class CommitTests
 	{
 		[Fact]
+		public void EqualsSubject()
+		{
+			CommitMessageLinter linter = new("[feature]{wip} This is a test");
+
+			Assert.Equal("This is a test", linter.Subject);
+		}
+		
+		[Fact]
 		public void TrueWithFullHeader()
 		{
 			CommitMessageLinter linter = new("[feature]{wip} This is a test");

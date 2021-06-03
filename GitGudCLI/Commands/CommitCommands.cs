@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using ConsoleHelper;
 using GitGudCLI.Modules;
 using GitGudCLI.Options;
 using GitGudCLI.Response;
@@ -25,7 +24,7 @@ namespace GitGudCLI.Commands
 			
 			if (!helper.HasRepo)
 			{
-				ColorConsole.WriteError("There is no repository");
+				SpectreHelper.WriteError("There is no repository");
 				return 1;
 			}
 			
@@ -67,26 +66,26 @@ namespace GitGudCLI.Commands
 					string message = GenerateCommitMessage(false, false, false, false);
 					if (string.IsNullOrWhiteSpace(message))
 					{
-						ColorConsole.WriteError("There was an error generating the commit message.");
+						SpectreHelper.WriteError("There was an error generating the commit message.");
 						return 1;
 					}
 						
-					ColorConsole.WriteWrappedHeader("Your commit message:");
-					ColorConsole.WriteInfo(message);
+					SpectreHelper.WriteWrappedHeader("Your commit message:");
+					SpectreHelper.WriteInfo(message);
 					return 0;
 				
 				default:
-					ColorConsole.WriteError($"The mode '{options.Mode}' is not valid.");
+					SpectreHelper.WriteError($"The mode '{options.Mode}' is not valid.");
 					return 1;
 			}
 
 			if (!_response.Success)
 			{
-				ColorConsole.WriteError(_response.Message);
+				SpectreHelper.WriteError(_response.Message);
 				return 1;
 			}
 
-			ColorConsole.WriteSuccess($"{_response.Message}\nCommit made successfully.");
+			SpectreHelper.WriteSuccess($"{_response.Message}\nCommit made successfully.");
 			return 0;
 		}
 
@@ -95,7 +94,7 @@ namespace GitGudCLI.Commands
 			var response = _helper.CanCommit(allowChanges, fullAdd);
 			if (validate && !response.Success)
 			{
-				ColorConsole.WriteError(response.Message);
+				SpectreHelper.WriteError(response.Message);
 				return string.Empty;
 			}
 
@@ -104,14 +103,14 @@ namespace GitGudCLI.Commands
 			string[] seeAlso = null;
 			if (completeCommit)
 			{
-				ColorConsole.WriteWrappedHeader("Enter the commit body (Optional):");
+				SpectreHelper.WriteWrappedHeader("Enter the commit body (Optional):");
 				commitBody = Console.ReadLine();
 
-				ColorConsole.WriteWrappedHeader("Enter the closed issues, comma separated (Optional):");
+				SpectreHelper.WriteWrappedHeader("Enter the closed issues, comma separated (Optional):");
 				closedIssues = Console.ReadLine()
 					?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-				ColorConsole.WriteWrappedHeader("Enter the 'see also' issues, comma separated (Optional):");
+				SpectreHelper.WriteWrappedHeader("Enter the 'see also' issues, comma separated (Optional):");
 				seeAlso = Console.ReadLine()
 					?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 			}
@@ -141,7 +140,7 @@ namespace GitGudCLI.Commands
 			string commitMessage = GenerateCommitMessage(isComplete, true, fullAdd);
 			if (commitMessage is null)
 			{
-				ColorConsole.WriteError("There was an error generating the commit message.");
+				SpectreHelper.WriteError("There was an error generating the commit message.");
 				return;
 			}
 			
