@@ -279,11 +279,7 @@ namespace GitGudCLI.Utils
 		
 		public GitResponse CommitAmend(string commitMessage, bool stageTracked)
 		{
-			var output = CanCommit();
-			if (!output.Success)
-				return output;
-
-			output = ExecuteGitCommand(stageTracked ? $@"commit --amend -am ""{commitMessage}""" 
+			var output = ExecuteGitCommand(stageTracked ? $@"commit --amend -am ""{commitMessage}""" 
 				: $@"commit --amend -m ""{commitMessage}""");
 
 			if (output.Success)

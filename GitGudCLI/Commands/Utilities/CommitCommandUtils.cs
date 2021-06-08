@@ -72,7 +72,7 @@ namespace GitGudCLI.Commands.Utilities
 			bool isComplete, string message, bool amend)
 		{
 			var response = helper.CanCommit(stageTracked || addUntracked, addUntracked);
-			if (!response.Success || amend)
+			if (amend || !response.Success)
 				return response;
 			
 			var commitMessage = GenerateCommitMessage(isComplete, message);
