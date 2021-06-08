@@ -4,7 +4,7 @@ using GitGudCLI.Modules;
 using GitGudCLI.Options;
 using GitGudCLI.Response;
 using GitGudCLI.Utils;
-using Sharprompt;
+using Spectre.Console;
 
 namespace GitGudCLI.Commands
 {
@@ -28,15 +28,30 @@ namespace GitGudCLI.Commands
 				return 1;
 			}
 			
-			_tag =  Prompt.Select("Select the commit tag: ", Constants.CommitTagsWithDescriptions[..^1])
+			_tag = AnsiConsole.Prompt(
+				new SelectionPrompt<string>()
+					.Title("Select the commit tag:")
+					.PageSize(10)
+					.MoreChoicesText("[grey](Move up and down to reveal more branches)[/]")
+					.AddChoices(Constants.CommitTagsWithDescriptions[..^1]))
 				.Split(':', StringSplitOptions.TrimEntries)[0];
-			_flags = Prompt.MultiSelect("Select the flags for this commit: ", 
-					Constants.CommitFlagsWithDescriptions, pageSize: 7, minimum: 0)
-				.OrderBy(flag => flag).Select(flag => flag.Split(':', StringSplitOptions.TrimEntries)[0]).ToArray();
-			Console.Write(new string('\n', _flags.Length));
 			
+			_flags = AnsiConsole.Prompt(
+				new MultiSelectionPrompt<string>()
+					.Title("Select the flags for this commit:")
+					.NotRequired()
+					.PageSize(10)
+					.MoreChoicesText("[grey](Move up and down to reveal more flags)[/]")
+					.InstructionsText(
+						"[grey](Press [blue]<space>[/] to toggle a flag, " + 
+						"[green]<enter>[/] to accept)[/]")
+					.AddChoices(Constants.CommitFlagsWithDescriptions))
+				.OrderBy(flag => flag)
+				.Select(flag => flag.Split(':', StringSplitOptions.TrimEntries)[0])
+				.ToArray();
+
 			if (string.IsNullOrWhiteSpace(options.Message))
-				_options.Message = Prompt.Input<string>("Please provide a commit message:");
+				_options.Message = AnsiConsole.Ask<string>("Please provide a commit message:");
 			
 			switch (options.Mode)
 			{
@@ -133,11 +148,15 @@ namespace GitGudCLI.Commands
 			var commitMode = string.Empty;
 			if (!fullAdd)
 			{
-				commitMode = Prompt.Select("Commit command:", 
-					new[] {"git commit -am", "git commit"}, defaultValue: "git commit -am");
+				commitMode = AnsiConsole.Prompt(
+					new SelectionPrompt<string>()
+						.Title("Commit command:")
+						.PageSize(10)
+						.MoreChoicesText("[grey](Move up and down to reveal more branches)[/]")
+						.AddChoices("git commit -m", "git commit -am"));
 			}
 
-			string commitMessage = GenerateCommitMessage(isComplete, true, fullAdd);
+			var commitMessage = GenerateCommitMessage(isComplete, true, fullAdd);
 			if (commitMessage is null)
 			{
 				SpectreHelper.WriteError("There was an error generating the commit message.");

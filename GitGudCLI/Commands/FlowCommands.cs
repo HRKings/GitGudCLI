@@ -4,7 +4,7 @@ using GitGudCLI.Options;
 using GitGudCLI.Response;
 using GitGudCLI.Structure;
 using GitGudCLI.Utils;
-using Sharprompt;
+using Spectre.Console;
 
 namespace GitGudCLI.Commands
 {
@@ -27,7 +27,12 @@ namespace GitGudCLI.Commands
 			}
 
 			if (string.IsNullOrWhiteSpace(_options.BranchName) && _options.Action is not ("init" or "fullinit"))
-				_options.BranchName = Prompt.Select("Please select a branch", helper.LocalBranches);
+				_options.BranchName = AnsiConsole.Prompt(
+					new SelectionPrompt<string>()
+						.Title("Please select a branch:")
+						.PageSize(10)
+						.MoreChoicesText("[grey](Move up and down to reveal more branches)[/]")
+						.AddChoices(helper.LocalBranches));
 
 			switch (_options.Action)
 			{
@@ -89,7 +94,12 @@ namespace GitGudCLI.Commands
 
 		private static void Start()
 		{
-			string type = Prompt.Select("Select the branch type: ", Constants.ValidWorkingBranchTypeWithDescriptions)
+			var type = AnsiConsole.Prompt(
+				new SelectionPrompt<string>()
+					.Title("Select the branch type:")
+					.PageSize(10)
+					.MoreChoicesText("[grey](Move up and down to reveal more branch types)[/]")
+					.AddChoices(Constants.ValidWorkingBranchTypeWithDescriptions))
 				.Split(':', StringSplitOptions.TrimEntries)[0];
 
 			_response = _flowHelper.Start(_options.BranchName, type);
