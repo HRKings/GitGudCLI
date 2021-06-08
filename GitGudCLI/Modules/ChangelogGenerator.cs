@@ -24,13 +24,26 @@ namespace GitGudCLI.Modules
 
 			var lintedMessages = messageList.Select(message => new CommitMessageLinter(message)).ToList();
 			
-			var added = lintedMessages.Where(message => message.IsValid && message.Tag is "feature").Select(linter => linter.Subject).ToList();
-			var changed = lintedMessages.Where(message => message.IsValid && message.Tag is "change").Select(linter => linter.Subject).ToList();
-			var breakingChanges = lintedMessages.Where(message => message.IsValid && message.HasFlags && message.Flags.Contains("!!!")).Select(linter => linter.Subject).ToList();
-			var fixes = lintedMessages.Where(message => message.IsValid && message.Tag is "fix").Select(linter => linter.Subject).ToList();
-			var updated = lintedMessages.Where(message => message.IsValid && message.Tag is "chore").Select(linter => linter.Subject).ToList();
-			var deprecated = lintedMessages.Where(message => message.IsValid && message.HasFlags && message.Flags.Contains("dpc")).Select(linter => linter.Subject).ToList();
-			var removed = lintedMessages.Where(message => message.IsValid && message.HasFlags && message.Flags.Contains("rm")).Select(linter => linter.Subject).ToList();
+			var added = lintedMessages.Where(message => message.IsValid && message.Tag is "feature")
+				.Select(linter => linter.Subject).ToList();
+			
+			var changed = lintedMessages.Where(message => message.IsValid && message.Tag is "change" or "refactor")
+				.Select(linter => linter.Subject).ToList();
+			
+			var breakingChanges = lintedMessages.Where(message => message.IsValid && message.HasFlags && message.Flags.Contains("!!!"))
+				.Select(linter => linter.Subject).ToList();
+			
+			var fixes = lintedMessages.Where(message => message.IsValid && message.Tag is "fix")
+				.Select(linter => linter.Subject).ToList();
+			
+			var updated = lintedMessages.Where(message => message.IsValid && message.Tag is "chore").
+				Select(linter => linter.Subject).ToList();
+			
+			var deprecated = lintedMessages.Where(message => message.IsValid && message.HasFlags && message.Flags.Contains("dpc"))
+				.Select(linter => linter.Subject).ToList();
+			
+			var removed = lintedMessages.Where(message => message.IsValid && message.HasFlags && message.Flags.Contains("rm"))
+				.Select(linter => linter.Subject).ToList();
 
 			var changelog = string.Empty;
 
@@ -45,14 +58,11 @@ namespace GitGudCLI.Modules
 			
 			if (fixes.Count != 0)
 				changelog += $"### Fixed\n{string.Join('\n', fixes)}\n\n";
-			
-			if (fixes.Count != 0)
-				changelog += $"### Fixed\n{string.Join('\n', fixes)}\n\n";
-			
+
 			if (updated.Count != 0)
 				changelog += $"### Updated\n{string.Join('\n', updated)}\n\n";
 			
-			if (updated.Count != 0)
+			if (deprecated.Count != 0)
 				changelog += $"### Deprecated\n{string.Join('\n', deprecated)}\n\n";
 			
 			if (removed.Count != 0)

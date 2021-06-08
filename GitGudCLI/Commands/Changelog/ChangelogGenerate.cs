@@ -18,8 +18,7 @@ namespace GitGudCLI.Commands.Changelog
 			if (Regex.Match(StartDate, @"\d{4}-\d{2}-\d{2}").Success) 
 				return ValidationResult.Success();
 			
-			SpectreHelper.WriteError("The date is invalid");
-			return ValidationResult.Error();
+			return ValidationResult.Error("The date is invalid");
 		}
 	}
 	
