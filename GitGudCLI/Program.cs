@@ -44,6 +44,8 @@ namespace GitGudCLI
 					flow.AddCommand<FlowComplete>("complete")
 						.WithDescription("Merges and deletes a local working branch");
 				});
+
+				config.AddCommand<ChangelogGenerate>("changelog");
 			});
 
 			return app.Run(args);
