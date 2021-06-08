@@ -71,7 +71,7 @@ namespace GitGudCLI.Commands.Utilities
 		public static GitResponse Commit(GitHelper helper, bool addUntracked, bool stageTracked,
 			bool isComplete, string message, bool amend)
 		{
-			var response = helper.CanCommit(true, addUntracked);
+			var response = helper.CanCommit(stageTracked || addUntracked, addUntracked);
 			if (!response.Success)
 				return response;
 			
