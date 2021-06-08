@@ -9,7 +9,7 @@
     <Authors>HRKings</Authors>
     <Description>A CLI for the GitGud model</Description>
     <RepositoryUrl>https://github.com/HRKings/GitGudCLI</RepositoryUrl>
-    <Version>1.0.2</Version>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
