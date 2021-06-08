@@ -16,6 +16,9 @@ namespace GitGudCLI.Commands.Utilities
 			string[] closedIssues = null;
 			string[] seeAlso = null;
 			
+			if(string.IsNullOrWhiteSpace(message))
+				message= AnsiConsole.Ask<string>("Enter the commit subject:");
+			
 			var tag = AnsiConsole.Prompt(
 					new SelectionPrompt<string>()
 						.Title("Select the commit tag:")

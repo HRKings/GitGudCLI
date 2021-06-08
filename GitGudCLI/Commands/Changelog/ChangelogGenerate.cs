@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Text.RegularExpressions;
 using GitGudCLI.Modules;
 using GitGudCLI.Utils;
@@ -8,6 +9,7 @@ namespace GitGudCLI.Commands.Changelog
 {
 	public class ChangelogGenerateOptions : CommandSettings
 	{
+		[Description("An ISO formatted date (YYYY-MM-dd) from where to start the changelog")]
 		[CommandArgument(0, "[StartDate]")]
 		public string StartDate { get; set; }
 

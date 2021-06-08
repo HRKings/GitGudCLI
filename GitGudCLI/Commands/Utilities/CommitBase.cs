@@ -9,6 +9,7 @@ namespace GitGudCLI.Commands.Utilities
 {
 	public class CommitBaseSettings : CommandSettings
 	{
+		[Description("The commit message")]
 		[CommandArgument(0, "[CommitMessage]")]
 		public string CommitMessage { get; set; }
 	}

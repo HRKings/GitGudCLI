@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using GitGudCLI.Structure;
 using GitGudCLI.Utils;
 using Spectre.Console;
@@ -8,6 +9,7 @@ namespace GitGudCLI.Commands.Flow
 {
 	public class FlowStartSettings : CommandSettings
 	{
+		[Description("The branch name")]
 		[CommandArgument(0, "[BranchName]")]
 		public string BranchName { get; set; }
 	}
