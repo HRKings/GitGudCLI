@@ -60,7 +60,7 @@ namespace GitGudCLI.Modules
 				changelog += $"### Fixed\n{string.Join('\n', fixes)}\n\n";
 
 			if (updated.Count != 0)
-				changelog += $"### Updated\n{string.Join('\n', updated)}\n\n";
+				changelog += $"### Chores\n{string.Join('\n', updated)}\n\n";
 			
 			if (deprecated.Count != 0)
 				changelog += $"### Deprecated\n{string.Join('\n', deprecated)}\n\n";
