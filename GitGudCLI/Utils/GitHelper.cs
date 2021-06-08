@@ -263,27 +263,13 @@ namespace GitGudCLI.Utils
 			return new GitResponse(true, EnumGitResponse.NONE, "There is changes to commit.");
 		}
 
-		public GitResponse Commit(string commitMessage)
+		public GitResponse Commit(string commitMessage, bool stageTracked)
 		{
 			var output = CanCommit();
 			if (!output.Success)
 				return output;
 
-			output = ExecuteGitCommand($@"commit -m ""{commitMessage}""");
-
-			if (output.Success)
-				_needsRefresh = true;
-
-			return output;
-		}
-
-		public GitResponse CommitAdd(string commitMessage)
-		{
-			var output = CanCommit();
-			if (!output.Success)
-				return output;
-
-			output = ExecuteGitCommand($@"commit -am ""{commitMessage}""");
+			output = ExecuteGitCommand(stageTracked ? $@"commit -am ""{commitMessage}""" : $@"commit -m ""{commitMessage}""");
 
 			if (output.Success)
 				_needsRefresh = true;
@@ -291,6 +277,21 @@ namespace GitGudCLI.Utils
 			return output;
 		}
 		
+		public GitResponse CommitAmend(string commitMessage, bool stageTracked)
+		{
+			var output = CanCommit();
+			if (!output.Success)
+				return output;
+
+			output = ExecuteGitCommand(stageTracked ? $@"commit --amend -am ""{commitMessage}""" 
+				: $@"commit --amend -m ""{commitMessage}""");
+
+			if (output.Success)
+				_needsRefresh = true;
+
+			return output;
+		}
+
 		public GitResponse CommitFullAdd(string commitMessage)
 		{
 			var output = CanCommit(true, true);

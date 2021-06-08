@@ -69,7 +69,7 @@ namespace GitGudCLI.Commands.Utilities
 		}
 
 		public static GitResponse Commit(GitHelper helper, bool addUntracked, bool stageTracked,
-			bool isComplete, string message)
+			bool isComplete, string message, bool amend)
 		{
 			var response = helper.CanCommit(true, addUntracked);
 			if (!response.Success)
@@ -84,7 +84,7 @@ namespace GitGudCLI.Commands.Utilities
 			if (addUntracked)
 				return helper.CommitFullAdd(commitMessage);
 			
-			return stageTracked ? helper.CommitAdd(commitMessage) : helper.Commit(commitMessage);
+			return amend ? helper.CommitAmend(commitMessage, stageTracked) : helper.Commit(commitMessage, stageTracked);
 		}
 	}
 }

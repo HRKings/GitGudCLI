@@ -7,6 +7,6 @@ namespace GitGudCLI.Commands.Commit
 	public class CommitAdd : Command<CommitBaseFullSettings>
 	{
 		public override int Execute(CommandContext context, CommitBaseFullSettings options)
-			=> CommitBase.PerformCommit(options.CommitMessage, false, true, options.FullCommit);
+			=> CommitBase.PerformCommit(options.CommitMessage, false, true, options.FullCommit, options.Amend);
 	}
 }

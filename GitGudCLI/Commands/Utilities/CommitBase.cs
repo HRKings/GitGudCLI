@@ -19,11 +19,15 @@ namespace GitGudCLI.Commands.Utilities
 		[Description("A full commit with body and footer")]
 		[CommandOption("-f|--full")]
 		public bool FullCommit { get; set; }
+		
+		[Description("Amend a previous commit")]
+		[CommandOption("--amend")]
+		public bool Amend { get; set; }
 	}
 	
 	public static class CommitBase
 	{
-		public static int PerformCommit(string commitMessage, bool addUntracked, bool stageTracked, bool fullCommit)
+		public static int PerformCommit(string commitMessage, bool addUntracked, bool stageTracked, bool fullCommit, bool amend)
 		{
 			var gitHelper = new GitHelper();
 			
@@ -34,7 +38,7 @@ namespace GitGudCLI.Commands.Utilities
 			}
 			
 			var response = CommitCommandUtils.Commit(gitHelper, addUntracked, stageTracked,
-				fullCommit, commitMessage);
+				fullCommit, commitMessage, amend);
 			
 			if (!response.Success)
 			{
