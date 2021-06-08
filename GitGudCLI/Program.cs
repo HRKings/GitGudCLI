@@ -1,8 +1,6 @@
-﻿using CommandLine;
-using GitGudCLI.Commands;
+﻿using GitGudCLI.Commands.Changelog;
+using GitGudCLI.Commands.Commit;
 using GitGudCLI.Commands.Flow;
-using GitGudCLI.Options;
-using GitGudCLI.Utils;
 using Spectre.Console.Cli;
 
 namespace GitGudCLI
@@ -15,6 +13,24 @@ namespace GitGudCLI
 			
 			app.Configure(config =>
 			{
+				config.AddBranch("commit", commit =>
+				{
+					commit.AddCommand<CommitPlain>("plain")
+						.WithDescription("Commit staged changes")
+						.WithAlias("p");
+					commit.AddCommand<CommitAdd>("add")
+						.WithDescription("Performs a 'git commit -am'")
+						.WithAlias("a");
+					commit.AddCommand<CommitQuick>("quick")
+						.WithDescription("Tracks all files and commit them")
+						.WithAlias("q");
+					commit.AddCommand<CommitLint>("lint")
+						.WithDescription("Lint a commit");
+					commit.AddCommand<CommitGenerateMessage>("generate")
+						.WithDescription("Generate a valid commit message")
+						.WithAlias("gen");
+				});
+				
 				config.AddBranch("flow", flow =>
 				{
 					flow.AddCommand<FlowFullInit>("fullinit")
