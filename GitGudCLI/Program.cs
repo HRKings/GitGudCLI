@@ -1,24 +1,36 @@
 ﻿using CommandLine;
 using GitGudCLI.Commands;
+using GitGudCLI.Commands.Flow;
 using GitGudCLI.Options;
 using GitGudCLI.Utils;
+using Spectre.Console.Cli;
 
 namespace GitGudCLI
 {
 	internal static class Program
 	{
-		private static GitHelper _gitHelper;
-
 		private static int Main(string[] args)
 		{
-			_gitHelper = new GitHelper();
+			var app = new CommandApp();
 			
-			Parser.Default.ParseArguments<CommitOptions, FlowOptions, ChangelogOptions>(args)
-				.WithParsed<CommitOptions>(options => CommitCommands.Run(options, _gitHelper))
-				.WithParsed<FlowOptions>(options => FlowCommands.Run(options, _gitHelper))
-				.WithParsed<ChangelogOptions>(options => ChangelogCommands.Run(options));
+			app.Configure(config =>
+			{
+				config.AddBranch("flow", flow =>
+				{
+					flow.AddCommand<FlowFullInit>("fullinit")
+						.WithDescription("Initializes a repository with a master and stable branch");
+					flow.AddCommand<FlowInit>("init")
+						.WithDescription("Creates a stable branch off the master");
+					flow.AddCommand<FlowStart>("start")
+						.WithDescription("Start a working branch and checkout to it");
+					flow.AddCommand<FlowPublish>("publish")
+						.WithDescription("Pushes a working branch to the origin");
+					flow.AddCommand<FlowComplete>("complete")
+						.WithDescription("Merges and deletes a local working branch");
+				});
+			});
 
-			return 0;
+			return app.Run(args);
 		}
 	}
 }

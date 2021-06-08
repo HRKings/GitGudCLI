@@ -14,7 +14,6 @@
 
   <ItemGroup>
     <PackageReference Include="CliWrap" Version="3.3.0" />
-    <PackageReference Include="CommandLineParser" Version="2.8.0" />
     <PackageReference Include="Spectre.Console" Version="0.39.1-preview.0.20" />
   </ItemGroup>
 
