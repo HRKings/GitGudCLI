@@ -46,6 +46,12 @@ namespace GitGudCLI.Commands.Utilities
 				return 1;
 			}
 
+			if (amend)
+			{
+				SpectreHelper.WriteSuccess($"{response.Message}\nCommit amend made successfully.");
+				return 0;
+			}
+
 			SpectreHelper.WriteSuccess($"{response.Message}\nCommit made successfully.");
 			return 0;
 		}
