@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using GitGudCLI.Modules;
 using GitGudCLI.Options;
 using GitGudCLI.Response;
@@ -26,13 +27,16 @@ namespace GitGudCLI.Commands
 				return 1;
 			}
 
-			if (string.IsNullOrWhiteSpace(_options.BranchName) && _options.Action is not ("init" or "fullinit"))
+			if (string.IsNullOrWhiteSpace(_options.BranchName) && _options.Action is "publish" or "complete")
 				_options.BranchName = AnsiConsole.Prompt(
 					new SelectionPrompt<string>()
 						.Title("Please select a branch:")
 						.PageSize(10)
 						.MoreChoicesText("[grey](Move up and down to reveal more branches)[/]")
 						.AddChoices(helper.LocalBranches));
+			
+			if (string.IsNullOrWhiteSpace(_options.BranchName) && _options.Action is "start")
+				_options.BranchName = AnsiConsole.Ask<string>("Please provide a branch name");
 
 			switch (_options.Action)
 			{
@@ -66,8 +70,6 @@ namespace GitGudCLI.Commands
 				SpectreHelper.WriteError(_response.Message);
 				return 1;
 			}
-
-			Console.WriteLine(_response.GitReponse);
 			
 			if (_response.GitReponse is not EnumGitResponse.NONE)
 			{
