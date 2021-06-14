@@ -41,30 +41,39 @@ This module is equivalent to the [Commit submodel](https://github.com/HRKings/Gi
 This command tracks all files (using `git add .`) and commits the changes using the provided message, it will ask you to select the commit tag and flags via a arrow based menu.
 
 ```Bash
-gitgud commit quickadd "Commit subject"
+gitgud commit quick "Commit subject"
 gitgud commit q "Commit subject"
-gitgud q "Commit subject"
 ```
+
+_Obs.: You can use the `-f` or `--full` flag to generate a commit with body and footer_
+
+_Obs.: You can use the `--amend` flag to amend your previous comment_
 
 #### Plain commit
 
-This command is a plain commit that will ask you if you want a simple commit ('git commit') or a commitadd ('git commit -am'), like the above it will ask you for the tag and flags.
+This command will perform a simple commit ('git commit -m'), like the above it will ask you for the tag and flags.
 
 ```Bash
 gitgud commit plain "Commit subject"
 gitgud commit p "Commit subject"
-gitgud p "Commit subject"
 ```
 
-#### Full commit
+_Obs.: You can use the `-f` or `--full` flag to generate a commit with body and footer_
 
-This command is the same as above, only this time it will ask you for a body, closed issues and "see also" issues.
+_Obs.: You can use the `--amend` flag to amend your previous comment_
+
+#### Plain commit
+
+This command will perform an add commit ('git commit -am'), like the above it will ask you for the tag and flags.
 
 ```Bash
-gitgud commit fullcommit "Commit subject"
-gitgud commit f "Commit subject"
-gitgud f "Commit subject"
+gitgud commit add "Commit subject"
+gitgud commit a "Commit subject"
 ```
+
+_Obs.: You can use the `-f` or `--full` flag to generate a commit with body and footer_
+
+_Obs.: You can use the `--amend` flag to amend your previous comment_
 
 #### Lint
 
@@ -73,8 +82,11 @@ This command is for linting commits, if you pass a commit message, it will valid
 ```Bash
 gitgud commit lint "Commit message"
 gitgud commit l "Commit message"
-gitgud l "Commit message"
 ```
+
+_Obs.: You can use the `-f` or `--full` flag to generate a commit with body and footer_
+
+_Obs.: You can use the `--amend` flag to amend your previous comment_
 
 #### Generate
 
@@ -83,7 +95,6 @@ This command will generate a commit message based on your inputs (tag and flags)
 ```Bash
 gitgud commit generate "Commit subject"
 gitgud commit g "Commit subject"
-gitgud g "Commit subject"
 ```
 
 ### Flow Module
