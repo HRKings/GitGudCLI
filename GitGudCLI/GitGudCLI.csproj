@@ -9,12 +9,11 @@
     <Authors>HRKings</Authors>
     <Description>A CLI for the GitGud model</Description>
     <RepositoryUrl>https://github.com/HRKings/GitGudCLI</RepositoryUrl>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CliWrap" Version="3.3.0" />
-    <PackageReference Include="CommandLineParser" Version="2.8.0" />
-    <PackageReference Include="Sharprompt" Version="2.1.2" />
     <PackageReference Include="Spectre.Console" Version="0.39.1-preview.0.20" />
   </ItemGroup>
 

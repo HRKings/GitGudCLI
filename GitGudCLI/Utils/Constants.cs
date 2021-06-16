@@ -31,7 +31,7 @@
 			"refactor : Any code refactoring, cleanup, formatting, improvements in code style and readability",
 			"test     : Adding, changing or refactoring tests, with no production code change",
 			"docs     : Changes in documentation, readme, guides, etc.",
-			"chore    : Updating dependencies, package manager configs, build tasks, etc.",
+			"chore    : Updates/Removes/Adds dependencies, package manager configs, build tasks, etc.",
 			"misc     : Anything not covered by the above categories",
 			"merge    : Special tag used only when merging pull requests, mainly used by the Flow Submodel"
 		};
