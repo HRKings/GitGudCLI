@@ -1,4 +1,6 @@
-# GitGud CLI
+# This tool was deprecated on 21/12/2021 - The new version is now written in Go, smaller and faster, it is the new official CLI, you can find the updated repository by [clicking here](https://github.com/HRKings/gitgud-cli)
+
+# GitGud CLI [Deprecated]
 
 [![GitGud](https://img.shields.io/badge/GitGud-v1.0-red?style=flat-square)](https://github.com/HRKings/GitGud/tree/stable)
 
